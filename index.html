@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulmonary X-Ray Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f5f0e8;
+    --cream2: #ede7d9;
+    --cream3: #e4dccb;
+    --white: #fdfaf5;
+    --ink: #1c1a17;
+    --ink2: #4a4640;
+    --ink3: #7a746c;
+    --rust: #b85c2a;
+    --rust-light: #f5e8df;
+    --green: #2e6b4f;
+    --green-light: #dff0e8;
+    --red: #8c2020;
+    --red-light: #f5dfdf;
+    --blue: #1a3d6b;
+    --blue-light: #dde8f5;
+    --border: rgba(28,26,23,0.12);
+    --border2: rgba(28,26,23,0.2);
+    --shadow: 0 1px 3px rgba(28,26,23,0.08), 0 4px 16px rgba(28,26,23,0.06);
+    --shadow-lg: 0 2px 8px rgba(28,26,23,0.08), 0 12px 40px rgba(28,26,23,0.1);
+  }
+
+  html { background: var(--cream); }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* LAYOUT */
+  .page { max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .logo-mark {
+    width: 52px; height: 52px;
+    background: var(--ink);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { opacity: 0.9; }
+  .header-title h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: -0.3px;
+  }
+  .header-title p { font-size: 13px; color: var(--ink3); margin-top: 3px; font-weight: 300; }
+  .research-badge {
+    background: #fef3cd;
+    border: 1px solid #e8d080;
+    color: #7a5a00;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    align-self: center;
+    letter-spacing: 0.04em;
+  }
+
+  /* GRID LAYOUT */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+    align-items: start;
+  }
+  .left-col { display: flex; flex-direction: column; gap: 16px; }
+  .right-col { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 24px; }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-header-title {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .card-body { padding: 18px; }
+
+  /* UPLOAD */
+  .upload-zone {
+    background: var(--white);
+    border: 1.5px dashed var(--border2);
+    border-radius: 16px;
+    padding: 44px 20px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--ink);
+    background: var(--cream);
+  }
+  .upload-zone input {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+  .upload-icon {
+    width: 52px; height: 52px;
+    background: var(--cream);
+    border: 1px solid var(--border2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    transition: background 0.2s;
+  }
+  .upload-zone:hover .upload-icon { background: var(--cream2); }
+  .upload-zone h3 { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .upload-zone p { font-size: 12px; color: var(--ink3); font-weight: 300; }
+  .file-tags { display: flex; gap: 6px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  .file-tag {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    color: var(--ink3);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    letter-spacing: 0.04em;
+  }
+
+  /* PREVIEW */
+  .preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .preview-pane { padding: 14px; }
+  .preview-pane + .preview-pane { border-left: 1px solid var(--border); }
+  .preview-pane label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .preview-pane img, .preview-pane canvas {
+    width: 100%; border-radius: 8px; display: block;
+    background: #111;
+  }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 10px; }
+  .btn-analyze {
+    flex: 1;
+    background: var(--ink);
+    color: var(--white);
+    border: none;
+    padding: 13px 20px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .btn-analyze:hover:not(:disabled) { background: #2e2b27; transform: translateY(-1px); }
+  .btn-analyze:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-reset {
+    background: var(--white);
+    color: var(--ink);
+    border: 1px solid var(--border2);
+    padding: 13px 20px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    display: none;
+    transition: all 0.2s;
+  }
+  .btn-reset:hover { background: var(--cream); }
+  .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(253,250,245,0.3);
+    border-top-color: rgba(253,250,245,0.9);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .analyzing .spinner { display: block; }
+  .analyzing .btn-lbl { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* VERDICT CARD */
+  .verdict-banner {
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-left: 4px solid var(--ink3);
+    background: var(--cream);
+    transition: all 0.4s ease;
+  }
+  .verdict-banner.ok { background: var(--green-light); border-left-color: var(--green); }
+  .verdict-banner.warn { background: var(--rust-light); border-left-color: var(--rust); }
+  .verdict-banner.crit { background: var(--red-light); border-left-color: var(--red); }
+  .verdict-icon {
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .verdict-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .verdict-sub { font-size: 12.5px; color: var(--ink2); line-height: 1.55; font-weight: 300; }
+
+  /* METRICS */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .metric {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .metric-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 5px;
+  }
+  .metric-value {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: -0.5px;
+  }
+  .metric-bar {
+    height: 3px;
+    background: var(--border2);
+    border-radius: 99px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .metric-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--ink);
+    transition: width 1s cubic-bezier(0.22,1,0.36,1);
+    width: 0%;
+  }
+  .metric-fill.ok { background: var(--green); }
+  .metric-fill.warn { background: var(--rust); }
+  .metric-fill.crit { background: var(--red); }
+
+  /* HISTOGRAM */
+  #histCanvas { width: 100%; height: 72px; display: block; border-radius: 6px; }
+
+  /* FINDINGS */
+  .findings-list { list-style: none; }
+  .finding-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+  .finding-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .finding-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .finding-dot.ok { background: var(--green); }
+  .finding-dot.warn { background: var(--rust); }
+  .finding-dot.crit { background: var(--red); }
+  .finding-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    background: var(--cream2);
+    color: var(--ink3);
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  /* ANALYSIS TEXT */
+  .analysis-section { font-size: 13px; color: var(--ink2); line-height: 1.7; }
+  .analysis-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .analysis-row:last-child { border-bottom: none; }
+  .ar-key { color: var(--ink3); font-size: 12px; font-weight: 300; white-space: nowrap; }
+  .ar-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); text-align: right; }
+  .ar-val.ok { color: var(--green); }
+  .ar-val.warn { color: var(--rust); }
+  .ar-val.crit { color: var(--red); }
+
+  /* SCORE RING */
+  .score-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+  }
+  .ring-svg { flex-shrink: 0; }
+  .ring-text { }
+  .ring-score {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .ring-label { font-size: 11px; color: var(--ink3); margin-top: 2px; font-weight: 300; }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    background: #fffbe6;
+    border: 1px solid #e8d87a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: #7a6600;
+    line-height: 1.6;
+    display: flex;
+    gap: 10px;
+  }
+  .disclaimer-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--ink3);
+  }
+  .empty-state svg { opacity: 0.3; margin: 0 auto 12px; display: block; }
+  .empty-state p { font-size: 13px; font-weight: 300; }
+
+  /* PROGRESS BAR ANIMATION */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in { animation: fadeUp 0.4s ease forwards; }
+
+  /* HIDDEN */
+  .hidden { display: none !important; }
+
+  @media (max-width: 700px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .right-col { position: static; }
+    .preview-grid { grid-template-columns: 1fr; }
+    .preview-pane + .preview-pane { border-left: none; border-top: 1px solid var(--border); }
+    .metrics-grid { grid-template-columns: 1fr 1fr; }
+    .header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6">
+          <rect x="2" y="3" width="20" height="18" rx="2"/>
+          <ellipse cx="12" cy="12" rx="5" ry="4"/>
+          <path d="M12 8V5M12 19v-3M7 12H4M20 12h-3"/>
+        </svg>
+      </div>
+      <div class="header-title">
+        <h1>Pulmonary X-Ray Analyzer</h1>
+        <p>AI-assisted chest radiograph screening · Local processing, no data sent</p>
+      </div>
+    </div>
+    <div class="research-badge">⚠ Research Use Only</div>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- LEFT COLUMN -->
+    <div class="left-col">
+
+      <!-- UPLOAD -->
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*">
+        <div class="upload-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a4640" stroke-width="1.8">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <h3>Drop chest X-ray here or click to browse</h3>
+        <p>PA or AP view recommended · DICOM preview, PNG, JPG supported</p>
+        <div class="file-tags">
+          <span class="file-tag">.png</span>
+          <span class="file-tag">.jpg</span>
+          <span class="file-tag">.jpeg</span>
+          <span class="file-tag">.webp</span>
+          <span class="file-tag">.bmp</span>
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="card hidden" id="previewCard">
+        <div class="card-header">
+          <span class="card-header-title">Radiograph Preview</span>
+          <span id="fileInfo" style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace">—</span>
+        </div>
+        <div class="preview-grid">
+          <div class="preview-pane">
+            <label>Original</label>
+            <img id="originalImg" alt="X-ray">
+          </div>
+          <div class="preview-pane">
+            <label>Sobel Edge Map</label>
+            <canvas id="edgeCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTOGRAM -->
+      <div class="card hidden" id="histCard">
+        <div class="card-header">
+          <span class="card-header-title">Pixel Intensity Histogram</span>
+          <span id="histStats" style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace">—</span>
+        </div>
+        <div class="card-body" style="padding:14px 18px">
+          <canvas id="histCanvas" height="72"></canvas>
+          <div style="display:flex;justify-content:space-between;margin-top:6px">
+            <span style="font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace">Dark (0)</span>
+            <span style="font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace">Mid (128)</span>
+            <span style="font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace">Bright (255)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="btn-row">
+        <button class="btn-analyze" id="analyzeBtn" disabled>
+          <div class="spinner"></div>
+          <span class="btn-lbl">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:5px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            Run Diagnostic Analysis
+          </span>
+        </button>
+        <button class="btn-reset hidden" id="resetBtn" onclick="resetAll()">Clear</button>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div class="disclaimer">
+        <span class="disclaimer-icon">⚠️</span>
+        <span><strong>For research purposes only.</strong> This tool performs pixel-level image analysis and cannot replace professional radiological assessment. All outputs must be reviewed by a licensed radiologist before clinical decisions are made.</span>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-col">
+
+      <!-- VERDICT -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-title">Diagnosis</span>
+          <span id="analysisTime" style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace"></span>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+            <rect x="2" y="3" width="20" height="18" rx="2"/>
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 8V6M12 18v-2M8 12H6M18 12h-2"/>
+          </svg>
+          <p>Upload an X-ray image and<br>click Analyze to begin</p>
+        </div>
+
+        <!-- Score ring + verdict -->
+        <div class="hidden" id="resultContent">
+          <div class="score-ring-wrap">
+            <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="28" fill="none" stroke="#e4dccb" stroke-width="6"/>
+              <circle id="ringCircle" cx="36" cy="36" r="28" fill="none" stroke="#1c1a17" stroke-width="6"
+                stroke-dasharray="175.93" stroke-dashoffset="175.93"
+                stroke-linecap="round" transform="rotate(-90 36 36)"
+                style="transition: stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1), stroke 0.4s ease"/>
+              <text id="ringPct" x="36" y="41" text-anchor="middle" font-family="'Instrument Serif', serif"
+                font-size="16" fill="#1c1a17">—</text>
+            </svg>
+            <div class="ring-text">
+              <div class="ring-score" id="abnScore">—</div>
+              <div class="ring-label">Abnormality Score / 100</div>
+            </div>
+          </div>
+
+          <div class="card-body" style="padding:14px 18px">
+            <div class="verdict-banner" id="verdictBanner">
+              <div class="verdict-icon" id="vIcon">—</div>
+              <div>
+                <div class="verdict-title" id="vTitle">Awaiting analysis</div>
+                <div class="verdict-sub" id="vSub">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- METRICS -->
+      <div class="card hidden" id="metricsCard">
+        <div class="card-header"><span class="card-header-title">Radiometric Indicators</span></div>
+        <div class="card-body">
+          <div class="metrics-grid">
+            <div class="metric">
+              <div class="metric-label">Edge Density</div>
+              <div class="metric-value" id="mEdge">—</div>
+              <div class="metric-bar"><div class="metric-fill" id="bEdge"></div></div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Opacity</div>
+              <div class="metric-value" id="mOp">—</div>
+              <div class="metric-bar"><div class="metric-fill" id="bOp"></div></div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Homogeneity</div>
+              <div class="metric-value" id="mHom">—</div>
+              <div class="metric-bar"><div class="metric-fill" id="bHom"></div></div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Asymmetry</div>
+              <div class="metric-value" id="mAsym">—</div>
+              <div class="metric-bar"><div class="metric-fill" id="bAsym"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DETAILED ANALYSIS -->
+      <div class="card hidden" id="analysisCard">
+        <div class="card-header"><span class="card-header-title">Signal Analysis</span></div>
+        <div class="card-body">
+          <div class="analysis-section" id="analysisRows"></div>
+        </div>
+      </div>
+
+      <!-- FINDINGS -->
+      <div class="card hidden" id="findingsCard">
+        <div class="card-header"><span class="card-header-title">Clinical Observations</span></div>
+        <div class="card-body" style="padding-top:10px;padding-bottom:10px">
+          <ul class="findings-list" id="findingsList"></ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DOM refs ──────────────────────────────────────────────────────────
+const uploadZone  = document.getElementById('uploadZone');
+const fileInput   = document.getElementById('fileInput');
+const previewCard = document.getElementById('previewCard');
+const histCard    = document.getElementById('histCard');
+const analyzeBtn  = document.getElementById('analyzeBtn');
+const resetBtn    = document.getElementById('resetBtn');
+const originalImg = document.getElementById('originalImg');
+const edgeCv      = document.getElementById('edgeCanvas');
+const ectx        = edgeCv.getContext('2d');
+const histCv      = document.getElementById('histCanvas');
+const hctx        = histCv.getContext('2d');
+
+let grayData = null, sobelData = null, imgW = 0, imgH = 0;
+
+// ── Drag-drop ─────────────────────────────────────────────────────────
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) loadFile(f); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+function loadFile(f) {
+  document.getElementById('fileInfo').textContent = f.name.length > 22 ? f.name.slice(0,20)+'…' : f.name;
+  const r = new FileReader();
+  r.onload = e => {
+    const im = new Image();
+    im.onload = () => {
+      originalImg.src = e.target.result;
+      imgW = im.width; imgH = im.height;
+      processLocally(im);
+      previewCard.classList.remove('hidden');
+      histCard.classList.remove('hidden');
+      analyzeBtn.disabled = false;
+      resetBtn.classList.remove('hidden');
+    };
+    im.src = e.target.result;
+  };
+  r.readAsDataURL(f);
+}
+
+// ── Local image processing ────────────────────────────────────────────
+function processLocally(im) {
+  const tmp = document.createElement('canvas');
+  tmp.width = imgW; tmp.height = imgH;
+  const tc = tmp.getContext('2d');
+  tc.drawImage(im, 0, 0);
+  const id = tc.getImageData(0, 0, imgW, imgH);
+  grayData = computeGray(id.data);
+  sobelData = computeSobel(grayData, imgW, imgH);
+  drawEdgeMap();
+  drawHistogram();
+}
+
+function computeGray(data) {
+  const g = new Float32Array(data.length / 4);
+  for (let i = 0; i < g.length; i++) {
+    const o = i * 4;
+    g[i] = 0.299 * data[o] + 0.587 * data[o+1] + 0.114 * data[o+2];
+  }
+  return g;
+}
+
+function computeSobel(g, w, h) {
+  const out = new Float32Array(w * h);
+  const kx = [[-1,0,1],[-2,0,2],[-1,0,1]];
+  const ky = [[-1,-2,-1],[0,0,0],[1,2,1]];
+  for (let y = 1; y < h-1; y++) {
+    for (let x = 1; x < w-1; x++) {
+      let px = 0, py = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const v = g[(y+dy)*w+(x+dx)];
+        px += v * kx[dy+1][dx+1];
+        py += v * ky[dy+1][dx+1];
+      }
+      out[y*w+x] = Math.sqrt(px*px + py*py);
+    }
+  }
+  return out;
+}
+
+function drawEdgeMap() {
+  edgeCv.width = imgW; edgeCv.height = imgH;
+  let mx = 0;
+  for (let i = 0; i < sobelData.length; i++) if (sobelData[i] > mx) mx = sobelData[i];
+  const id = ectx.createImageData(imgW, imgH);
+  for (let i = 0; i < sobelData.length; i++) {
+    const v = Math.min(255, (sobelData[i] / mx) * 255 * 1.6);
+    id.data[i*4] = v; id.data[i*4+1] = v; id.data[i*4+2] = v; id.data[i*4+3] = 255;
+  }
+  ectx.putImageData(id, 0, 0);
+}
+
+function drawHistogram() {
+  const hist = new Array(256).fill(0);
+  for (let i = 0; i < grayData.length; i++) hist[Math.min(255, Math.floor(grayData[i]))]++;
+  const mx = Math.max(...hist);
+  const W = histCv.width = histCv.offsetWidth || 500;
+  const H = 72; histCv.height = H;
+  hctx.clearRect(0, 0, W, H);
+  const bw = W / 256;
+
+  // Dark region (0-85): deep teal
+  // Mid region (85-170): warm sand
+  // Bright region (170-255): warm rust
+  for (let i = 0; i < 256; i++) {
+    const bh = Math.max(1, (hist[i] / mx) * H * 0.92);
+    if (i < 85) hctx.fillStyle = `rgba(30,80,110,${0.5+0.4*(i/85)})`;
+    else if (i < 170) hctx.fillStyle = `rgba(120,100,70,${0.5+0.3*((i-85)/85)})`;
+    else hctx.fillStyle = `rgba(160,75,35,${0.4+0.4*((i-170)/85)})`;
+    hctx.fillRect(i * bw, H - bh, bw + 0.3, bh);
+  }
+
+  // Stats
+  let sum = 0, cnt = 0;
+  for (let i = 0; i < 256; i++) { sum += i * hist[i]; cnt += hist[i]; }
+  const mean = sum / cnt;
+  document.getElementById('histStats').textContent = `mean: ${Math.round(mean)} · pixels: ${cnt.toLocaleString()}`;
+}
+
+// ── Diagnostic engine ─────────────────────────────────────────────────
+analyzeBtn.addEventListener('click', () => {
+  if (!grayData) return;
+  analyzeBtn.classList.add('analyzing');
+  analyzeBtn.disabled = true;
+  const t0 = performance.now();
+  setTimeout(() => {
+    const res = runDiagnostics();
+    renderResults(res);
+    const ms = Math.round(performance.now() - t0);
+    document.getElementById('analysisTime').textContent = `${ms}ms`;
+    analyzeBtn.classList.remove('analyzing');
+    analyzeBtn.disabled = false;
+  }, 600);
+});
+
+function runDiagnostics() {
+  const g = grayData, s = sobelData, N = g.length;
+
+  // ── 1. Basic statistics ──
+  let sumG = 0, sumGsq = 0;
+  let dark = 0, midDark = 0, mid = 0, bright = 0, vBright = 0;
+  for (let i = 0; i < N; i++) {
+    const v = g[i];
+    sumG += v; sumGsq += v * v;
+    if (v < 40) dark++;
+    else if (v < 80) midDark++;
+    else if (v < 150) mid++;
+    else if (v < 210) bright++;
+    else vBright++;
+  }
+  const mean = sumG / N;
+  const variance = sumGsq / N - mean * mean;
+  const stdDev = Math.sqrt(variance);
+
+  const pDark     = dark / N;
+  const pMidDark  = midDark / N;
+  const pMid      = mid / N;
+  const pBright   = bright / N;
+  const pVBright  = vBright / N;
+
+  // ── 2. Histogram analysis ──
+  const hist = new Array(256).fill(0);
+  for (let i = 0; i < N; i++) hist[Math.min(255, Math.floor(g[i]))]++;
+
+  // Smooth histogram for peak detection
+  const sm = hist.map((_, i) => {
+    let s2 = 0, c = 0;
+    for (let d = -5; d <= 5; d++) { if (i+d >= 0 && i+d < 256) { s2 += hist[i+d]; c++; } }
+    return s2 / c;
+  });
+  let peaks = 0, peakPositions = [];
+  for (let i = 3; i < 253; i++) {
+    if (sm[i] > sm[i-1] && sm[i] > sm[i-2] && sm[i] > sm[i+1] && sm[i] > sm[i+2] && sm[i] > N * 0.005) {
+      peaks++;
+      peakPositions.push(i);
+    }
+  }
+  const bimodal = peaks >= 2;
+
+  // Dark cluster prominence (consolidation = large dark region)
+  const darkCluster = hist.slice(0, 70).reduce((a, b) => a + b, 0) / N;
+  const consolidationProxy = darkCluster > 0.30;
+
+  // ── 3. Edge analysis ──
+  let edgeSum = 0, highEdgePx = 0;
+  for (let i = 0; i < s.length; i++) {
+    edgeSum += s[i];
+    if (s[i] > 60) highEdgePx++;
+  }
+  const edgeDensity = Math.min(100, Math.round((edgeSum / (s.length * 200)) * 600));
+  const highEdgeRatio = highEdgePx / s.length;
+
+  // ── 4. Regional texture (block variance) ──
+  const bsz = 20;
+  let blockVars = [];
+  for (let by = 0; by + bsz < imgH; by += bsz) {
+    for (let bx = 0; bx + bsz < imgW; bx += bsz) {
+      let bs = 0, bss = 0, bc = 0;
+      for (let dy = 0; dy < bsz; dy++) for (let dx = 0; dx < bsz; dx++) {
+        const v = g[(by+dy)*imgW+(bx+dx)]; bs += v; bss += v*v; bc++;
+      }
+      const bm = bs/bc; blockVars.push(bss/bc - bm*bm);
+    }
+  }
+  blockVars.sort((a,b) => a-b);
+  const medBlockVar = blockVars[Math.floor(blockVars.length/2)];
+  const homogeneity = Math.max(0, 100 - Math.round(Math.sqrt(medBlockVar) / 1.1));
+
+  // ── 5. Left-right asymmetry ──
+  let lSum = 0, rSum = 0;
+  const halfW = Math.floor(imgW / 2);
+  for (let y = Math.floor(imgH*0.15); y < Math.floor(imgH*0.85); y++) {
+    for (let x = 10; x < halfW-10; x++) lSum += g[y*imgW+x];
+    for (let x = halfW+10; x < imgW-10; x++) rSum += g[y*imgW+x];
+  }
+  const lMean = lSum / ((imgH*0.7)*(halfW-20));
+  const rMean = rSum / ((imgH*0.7)*(imgW-halfW-20));
+  const asymmRaw = Math.abs(lMean - rMean);
+  const asymmScore = Math.min(100, Math.round(asymmRaw / 255 * 600));
+  const leftDarker = lMean < rMean;
+
+  // ── 6. Central opacity (hilar region proxy) ──
+  const cx0 = Math.floor(imgW * 0.35), cx1 = Math.floor(imgW * 0.65);
+  const cy0 = Math.floor(imgH * 0.25), cy1 = Math.floor(imgH * 0.75);
+  let cSum = 0, cCnt = 0;
+  for (let y = cy0; y < cy1; y++) for (let x = cx0; x < cx1; x++) { cSum += g[y*imgW+x]; cCnt++; }
+  const centralMean = cSum / cCnt;
+  const centralDark = centralMean < 80;
+
+  // ── 7. Peripheral vs central density ratio ──
+  let periSum = 0, periCnt = 0;
+  for (let y = 0; y < imgH; y++) for (let x = 0; x < imgW; x++) {
+    const isPeripheral = x < imgW*0.15 || x > imgW*0.85 || y < imgH*0.1 || y > imgH*0.9;
+    if (isPeripheral) { periSum += g[y*imgW+x]; periCnt++; }
+  }
+  const periMean = periSum / periCnt;
+  const periCentralRatio = centralMean > 0 ? periMean / centralMean : 1;
+
+  // ── 8. Opacity score ──
+  const opScore = Math.round((pDark + pMidDark * 0.5) * 100);
+
+  // ── 9. Composite abnormality score ──
+  let abn = 0;
+  // Opacity signals
+  if (opScore > 45) abn += 28;
+  else if (opScore > 30) abn += 16;
+  else if (opScore > 18) abn += 8;
+
+  // Edge signals
+  if (edgeDensity > 60) abn += 20;
+  else if (edgeDensity > 45) abn += 12;
+  else if (edgeDensity > 30) abn += 6;
+
+  // Histogram signals
+  if (bimodal) abn += 12;
+  if (consolidationProxy) abn += 14;
+
+  // Asymmetry
+  if (asymmScore > 15) abn += 14;
+  else if (asymmScore > 8) abn += 7;
+
+  // Homogeneity
+  if (homogeneity < 40) abn += 12;
+  else if (homogeneity < 55) abn += 6;
+
+  abn = Math.min(100, Math.round(abn));
+
+  // ── 10. Build clinical interpretation ──
+  const interpretation = buildInterpretation({
+    abn, opScore, edgeDensity, homogeneity, asymmScore, bimodal,
+    consolidationProxy, centralDark, leftDarker, mean, stdDev,
+    pDark, pBright, pVBright, highEdgeRatio, periCentralRatio
+  });
+
+  return {
+    abn, opScore, edgeDensity, homogeneity, asymmScore,
+    mean, stdDev, bimodal, consolidationProxy, centralDark,
+    leftDarker, peakPositions, peaks, interpretation
+  };
+}
+
+function buildInterpretation(p) {
+  let verdict, vClass, icon, title, summary;
+  const findings = [];
+  const analysisRows = [];
+
+  if (p.abn >= 62) {
+    verdict = 'CRITICAL';
+    vClass = 'crit';
+    icon = '🚨';
+    title = 'Significant Abnormality Detected';
+    summary = `Multiple radiometric markers are strongly elevated (composite score ${p.abn}/100). Pattern is consistent with consolidation or dense infiltrate. Urgent radiologist review is recommended.`;
+  } else if (p.abn >= 38) {
+    verdict = 'POSSIBLE';
+    vClass = 'warn';
+    icon = '⚠️';
+    title = 'Possible Abnormality — Correlate Clinically';
+    summary = `Moderate radiometric abnormality signals detected (score ${p.abn}/100). Findings suggest possible opacity or partial infiltrate. Clinical correlation and follow-up imaging advised.`;
+  } else {
+    verdict = 'NORMAL';
+    vClass = 'ok';
+    icon = '✅';
+    title = 'No Significant Abnormality Detected';
+    summary = `Radiometric indicators are within normal range (score ${p.abn}/100). Lung fields appear relatively clear. Routine follow-up as clinically appropriate.`;
+  }
+
+  // Lung field clarity
+  if (p.opScore > 40) findings.push({ sev: 'crit', label: 'OPACITY', text: `High opacity score (${p.opScore}%) — dense dark regions detected, possible consolidation or infiltrate.` });
+  else if (p.opScore > 22) findings.push({ sev: 'warn', label: 'OPACITY', text: `Moderate opacity (${p.opScore}%) — mild increased density in lung fields.` });
+  else findings.push({ sev: 'ok', label: 'OPACITY', text: `Opacity score normal (${p.opScore}%) — lung fields appear clear.` });
+
+  // Asymmetry
+  if (p.asymmScore > 14) findings.push({ sev: 'crit', label: 'ASYMMETRY', text: `Notable left-right asymmetry (${p.asymmScore}%) — ${p.leftDarker ? 'left' : 'right'} lung field denser, may indicate unilateral infiltrate.` });
+  else if (p.asymmScore > 7) findings.push({ sev: 'warn', label: 'ASYMMETRY', text: `Mild asymmetry (${p.asymmScore}%) — slight density difference between lung fields.` });
+  else findings.push({ sev: 'ok', label: 'ASYMMETRY', text: `Symmetric density distribution (${p.asymmScore}%) — bilateral fields appear balanced.` });
+
+  // Texture homogeneity
+  if (p.homogeneity < 42) findings.push({ sev: 'warn', label: 'TEXTURE', text: `Low homogeneity (${p.homogeneity}%) — patchy heterogeneous texture may indicate irregular infiltrate pattern.` });
+  else if (p.homogeneity < 58) findings.push({ sev: 'warn', label: 'TEXTURE', text: `Moderate texture variation (${p.homogeneity}%) — some heterogeneity present.` });
+  else findings.push({ sev: 'ok', label: 'TEXTURE', text: `Field texture homogeneous (${p.homogeneity}%) — uniform parenchymal pattern.` });
+
+  // Histogram
+  if (p.bimodal) findings.push({ sev: 'warn', label: 'HISTOGRAM', text: `Bimodal intensity distribution (${p.peaks} peaks at [${p.peakPositions.slice(0,3).join(', ')}]) — mixed density suggests coexisting consolidation and aeration.` });
+  else findings.push({ sev: 'ok', label: 'HISTOGRAM', text: `Unimodal intensity histogram — relatively uniform density distribution across the field.` });
+
+  // Central opacity
+  if (p.centralDark) findings.push({ sev: 'warn', label: 'HILAR', text: `Central field shows increased opacity — possible hilar adenopathy or mediastinal involvement.` });
+  else findings.push({ sev: 'ok', label: 'HILAR', text: `Central / hilar region appears within expected density range.` });
+
+  // Edge density
+  if (p.edgeDensity > 58) findings.push({ sev: 'warn', label: 'EDGES', text: `High edge density (${p.edgeDensity}%) — sharp texture boundaries may indicate air-space disease borders.` });
+  else findings.push({ sev: 'ok', label: 'EDGES', text: `Edge density within normal range (${p.edgeDensity}%) — no irregular sharp borders.` });
+
+  // Analysis rows
+  analysisRows.push(
+    { k: 'Mean pixel intensity', v: Math.round(p.mean) + ' / 255', cls: p.mean < 70 ? 'warn' : 'ok' },
+    { k: 'Std deviation', v: Math.round(p.stdDev), cls: p.stdDev > 65 ? 'warn' : 'ok' },
+    { k: 'Dark pixel fraction', v: (p.pDark * 100).toFixed(1) + '%', cls: p.pDark > 0.35 ? 'crit' : p.pDark > 0.2 ? 'warn' : 'ok' },
+    { k: 'Bright pixel fraction', v: (p.pBright * 100).toFixed(1) + '%', cls: 'ok' },
+    { k: 'Histogram modality', v: p.bimodal ? 'Bimodal' : 'Unimodal', cls: p.bimodal ? 'warn' : 'ok' },
+    { k: 'Consolidation proxy', v: p.consolidationProxy ? 'Elevated' : 'Normal', cls: p.consolidationProxy ? 'crit' : 'ok' },
+    { k: 'Composite score', v: p.abn + ' / 100', cls: p.abn >= 62 ? 'crit' : p.abn >= 38 ? 'warn' : 'ok' },
+  );
+
+  return { verdict, vClass, icon, title, summary, findings, analysisRows };
+}
+
+// ── Render results ────────────────────────────────────────────────────
+function renderResults(r) {
+  const i = r.interpretation;
+
+  // Show result panels
+  document.getElementById('emptyState').classList.add('hidden');
+  document.getElementById('resultContent').classList.remove('hidden');
+  document.getElementById('metricsCard').classList.remove('hidden');
+  document.getElementById('analysisCard').classList.remove('hidden');
+  document.getElementById('findingsCard').classList.remove('hidden');
+
+  // Score ring
+  const circ = 2 * Math.PI * 28;
+  const offset = circ * (1 - r.abn / 100);
+  const ring = document.getElementById('ringCircle');
+  const ringColors = { ok: '#2e6b4f', warn: '#b85c2a', crit: '#8c2020' };
+  ring.style.strokeDashoffset = circ; // reset
+  setTimeout(() => {
+    ring.style.strokeDashoffset = offset;
+    ring.style.stroke = ringColors[i.vClass];
+  }, 50);
+  document.getElementById('ringPct').textContent = r.abn;
+  document.getElementById('ringPct').setAttribute('fill', ringColors[i.vClass]);
+  document.getElementById('abnScore').textContent = r.abn;
+
+  // Verdict banner
+  const banner = document.getElementById('verdictBanner');
+  banner.className = 'verdict-banner ' + i.vClass;
+  document.getElementById('vIcon').textContent = i.icon;
+  document.getElementById('vTitle').textContent = i.title;
+  document.getElementById('vSub').textContent = i.summary;
+
+  // Metrics
+  const mc = { ok: 'ok', warn: 'warn', crit: 'crit' };
+  setMetric('mEdge', 'bEdge', r.edgeDensity + '%', r.edgeDensity, r.edgeDensity > 55 ? 'warn' : 'ok');
+  setMetric('mOp',   'bOp',   r.opScore + '%',     r.opScore,     r.opScore > 35 ? 'crit' : r.opScore > 20 ? 'warn' : 'ok');
+  setMetric('mHom',  'bHom',  r.homogeneity + '%', r.homogeneity, r.homogeneity < 45 ? 'warn' : 'ok');
+  setMetric('mAsym', 'bAsym', r.asymmScore + '%',  r.asymmScore,  r.asymmScore > 14 ? 'crit' : r.asymmScore > 7 ? 'warn' : 'ok');
+
+  // Analysis rows
+  const ar = document.getElementById('analysisRows');
+  ar.innerHTML = '';
+  i.analysisRows.forEach(row => {
+    ar.innerHTML += `<div class="analysis-row"><span class="ar-key">${row.k}</span><span class="ar-val ${row.cls}">${row.v}</span></div>`;
+  });
+
+  // Findings
+  const fl = document.getElementById('findingsList');
+  fl.innerHTML = '';
+  i.findings.forEach(f => {
+    const li = document.createElement('li');
+    li.className = 'finding-item animate-in';
+    li.innerHTML = `<div class="finding-dot ${f.sev}"></div><div><span class="finding-label">${f.label}</span>${f.text}</div>`;
+    fl.appendChild(li);
+  });
+}
+
+function setMetric(valId, barId, val, pct, cls) {
+  document.getElementById(valId).textContent = val;
+  const bar = document.getElementById(barId);
+  bar.className = 'metric-fill ' + cls;
+  setTimeout(() => { bar.style.width = Math.min(100, pct) + '%'; }, 80);
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────
+function resetAll() {
+  grayData = null; sobelData = null;
+  fileInput.value = '';
+  previewCard.classList.add('hidden');
+  histCard.classList.add('hidden');
+  analyzeBtn.disabled = true;
+  resetBtn.classList.add('hidden');
+  document.getElementById('emptyState').classList.remove('hidden');
+  document.getElementById('resultContent').classList.add('hidden');
+  document.getElementById('metricsCard').classList.add('hidden');
+  document.getElementById('analysisCard').classList.add('hidden');
+  document.getElementById('findingsCard').classList.add('hidden');
+  document.getElementById('analysisTime').textContent = '';
+}
+</script>
+</body>
+</html>
