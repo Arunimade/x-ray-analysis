@@ -3,1049 +3,644 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pulmonary X-Ray Analyzer</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Chest X-Ray Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f2ede4;--surface:#faf7f2;--surface2:#eeead f;--s2:#eee8dc;--s3:#e6dfcf;
+  --border:rgba(55,45,25,0.13);--borderB:rgba(55,45,25,0.22);
+  --ink:#1e1b16;--ink2:#4c4840;--ink3:#8a847c;
+  --green:#27664a;--gbg:#e4f2ec;--gbd:#a8d4bc;
+  --amber:#8f5010;--abg:#fef2de;--abd:#f0c070;
+  --red:#881f1f;--rbg:#fde8e8;--rbd:#e0a0a0;
+  --sh:0 1px 4px rgba(30,27,22,0.07),0 4px 16px rgba(30,27,22,0.06);
+}
+html,body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
 
-  :root {
-    --cream: #f5f0e8;
-    --cream2: #ede7d9;
-    --cream3: #e4dccb;
-    --white: #fdfaf5;
-    --ink: #1c1a17;
-    --ink2: #4a4640;
-    --ink3: #7a746c;
-    --rust: #b85c2a;
-    --rust-light: #f5e8df;
-    --green: #2e6b4f;
-    --green-light: #dff0e8;
-    --red: #8c2020;
-    --red-light: #f5dfdf;
-    --blue: #1a3d6b;
-    --blue-light: #dde8f5;
-    --border: rgba(28,26,23,0.12);
-    --border2: rgba(28,26,23,0.2);
-    --shadow: 0 1px 3px rgba(28,26,23,0.08), 0 4px 16px rgba(28,26,23,0.06);
-    --shadow-lg: 0 2px 8px rgba(28,26,23,0.08), 0 12px 40px rgba(28,26,23,0.1);
-  }
+.page{max-width:1000px;margin:0 auto;padding:36px 20px 80px}
 
-  html { background: var(--cream); }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.6;
-  }
+/* HEADER */
+.hdr{display:flex;align-items:center;gap:14px;margin-bottom:36px;padding-bottom:26px;border-bottom:1px solid var(--border)}
+.hlogo{width:46px;height:46px;background:var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.htxt h1{font-family:'Lora',serif;font-size:22px;font-weight:600;letter-spacing:-0.3px;line-height:1.2}
+.htxt p{font-size:12px;color:var(--ink3);font-weight:300;margin-top:2px}
+.hbadge{margin-left:auto;background:#fff8e0;border:1px solid var(--abd);color:var(--amber);font-size:10px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:20px;white-space:nowrap}
 
-  /* LAYOUT */
-  .page { max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; }
+/* UPLOAD */
+.dropzone{background:var(--surface);border:1.5px dashed var(--borderB);border-radius:16px;padding:44px 20px;text-align:center;cursor:pointer;position:relative;transition:all 0.2s;margin-bottom:16px}
+.dropzone:hover,.dropzone.over{border-color:var(--ink);background:var(--s2)}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dico{width:52px;height:52px;background:var(--s2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;transition:background 0.2s}
+.dropzone:hover .dico{background:var(--s3)}
+.dropzone h3{font-size:15px;font-weight:500;margin-bottom:5px}
+.dropzone p{font-size:12px;color:var(--ink3);font-weight:300}
+.ftags{display:flex;gap:5px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.ftag{background:var(--s2);border:1px solid var(--border);color:var(--ink3);font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 7px;border-radius:5px}
 
-  /* HEADER */
-  .header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 40px;
-    padding-bottom: 32px;
-    border-bottom: 1px solid var(--border);
-    gap: 16px;
-  }
-  .header-left { display: flex; align-items: center; gap: 16px; }
-  .logo-mark {
-    width: 52px; height: 52px;
-    background: var(--ink);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .logo-mark svg { opacity: 0.9; }
-  .header-title h1 {
-    font-family: 'Instrument Serif', serif;
-    font-size: 28px;
-    font-weight: 400;
-    color: var(--ink);
-    line-height: 1.15;
-    letter-spacing: -0.3px;
-  }
-  .header-title p { font-size: 13px; color: var(--ink3); margin-top: 3px; font-weight: 300; }
-  .research-badge {
-    background: #fef3cd;
-    border: 1px solid #e8d080;
-    color: #7a5a00;
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    padding: 5px 12px;
-    border-radius: 20px;
-    white-space: nowrap;
-    align-self: center;
-    letter-spacing: 0.04em;
-  }
+/* FILE BAR */
+.filebar{display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 14px;margin-bottom:14px;align-items:center;gap:10px}
+.filebar.on{display:flex}
+.fbn{font-size:13px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fbs{font-size:11px;color:var(--ink3);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.fbx{background:none;border:none;cursor:pointer;color:var(--ink3);padding:3px;border-radius:5px;display:flex;transition:color 0.15s}
+.fbx:hover{color:var(--ink)}
 
-  /* GRID LAYOUT */
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 20px;
-    align-items: start;
-  }
-  .left-col { display: flex; flex-direction: column; gap: 16px; }
-  .right-col { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 24px; }
+/* PREVIEW */
+.prevwrap{display:none;margin-bottom:14px}
+.prevwrap.on{display:block}
+.prevcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--sh)}
+.prevhead{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--s2);border-bottom:1px solid var(--border)}
+.prevhead-lbl{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em}
+.prevgrid{display:grid;grid-template-columns:1fr 1fr 1fr}
+.prevpane{padding:10px}
+.prevpane+.prevpane{border-left:1px solid var(--border)}
+.prevpane label{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:6px}
+.prevpane img,.prevpane canvas{width:100%;border-radius:6px;display:block;background:#080808;min-height:70px;object-fit:contain}
 
-  /* CARDS */
-  .card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .card-header {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    background: var(--cream);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .card-header-title {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    color: var(--ink3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .card-body { padding: 18px; }
+/* HISTOGRAM */
+.histwrap{display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--sh);margin-bottom:14px}
+.histwrap.on{display:block}
+.histhead{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--s2);border-bottom:1px solid var(--border)}
+.histhead-lbl{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em}
+.histbody{padding:14px 16px 10px}
+#histCanvas{width:100%;height:76px;display:block}
+.haxis{display:flex;justify-content:space-between;margin-top:4px}
+.haxis span{font-size:10px;color:var(--ink3);font-family:'JetBrains Mono',monospace}
 
-  /* UPLOAD */
-  .upload-zone {
-    background: var(--white);
-    border: 1.5px dashed var(--border2);
-    border-radius: 16px;
-    padding: 44px 20px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-  }
-  .upload-zone:hover, .upload-zone.drag-over {
-    border-color: var(--ink);
-    background: var(--cream);
-  }
-  .upload-zone input {
-    position: absolute; inset: 0;
-    opacity: 0; cursor: pointer;
-    width: 100%; height: 100%;
-  }
-  .upload-icon {
-    width: 52px; height: 52px;
-    background: var(--cream);
-    border: 1px solid var(--border2);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
-    transition: background 0.2s;
-  }
-  .upload-zone:hover .upload-icon { background: var(--cream2); }
-  .upload-zone h3 { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
-  .upload-zone p { font-size: 12px; color: var(--ink3); font-weight: 300; }
-  .file-tags { display: flex; gap: 6px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
-  .file-tag {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    color: var(--ink3);
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 5px;
-    letter-spacing: 0.04em;
-  }
+/* BUTTONS */
+.btnrow{display:flex;gap:10px;margin-bottom:20px}
+.btnA{flex:1;background:var(--ink);color:#faf7f2;border:none;padding:13px 20px;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s}
+.btnA:hover:not(:disabled){background:#2a2520;box-shadow:0 4px 16px rgba(30,27,22,0.2)}
+.btnA:disabled{opacity:0.38;cursor:not-allowed}
+.btnR{background:var(--surface);color:var(--ink);border:1px solid var(--borderB);padding:13px 20px;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;cursor:pointer;display:none;transition:all 0.2s;font-weight:500}
+.btnR:hover{background:var(--s2)}
+.spin{width:15px;height:15px;border:2px solid rgba(250,247,242,0.3);border-top-color:rgba(250,247,242,0.9);border-radius:50%;animation:sp 0.65s linear infinite;display:none;flex-shrink:0}
+.running .spin{display:block}
+.running .btxt{opacity:0.7}
+@keyframes sp{to{transform:rotate(360deg)}}
 
-  /* PREVIEW */
-  .preview-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-  .preview-pane { padding: 14px; }
-  .preview-pane + .preview-pane { border-left: 1px solid var(--border); }
-  .preview-pane label {
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    color: var(--ink3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    display: block;
-    margin-bottom: 8px;
-  }
-  .preview-pane img, .preview-pane canvas {
-    width: 100%; border-radius: 8px; display: block;
-    background: #111;
-  }
+/* RESULTS (hidden until analyze) */
+.results{display:none}
 
-  /* BUTTONS */
-  .btn-row { display: flex; gap: 10px; }
-  .btn-analyze {
-    flex: 1;
-    background: var(--ink);
-    color: var(--white);
-    border: none;
-    padding: 13px 20px;
-    border-radius: 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: all 0.2s;
-    letter-spacing: 0.01em;
-  }
-  .btn-analyze:hover:not(:disabled) { background: #2e2b27; transform: translateY(-1px); }
-  .btn-analyze:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .btn-reset {
-    background: var(--white);
-    color: var(--ink);
-    border: 1px solid var(--border2);
-    padding: 13px 20px;
-    border-radius: 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    display: none;
-    transition: all 0.2s;
-  }
-  .btn-reset:hover { background: var(--cream); }
-  .spinner {
-    width: 15px; height: 15px;
-    border: 2px solid rgba(253,250,245,0.3);
-    border-top-color: rgba(253,250,245,0.9);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    display: none;
-  }
-  .analyzing .spinner { display: block; }
-  .analyzing .btn-lbl { display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* VERDICT */
+.vcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh);margin-bottom:14px}
+.vtop{padding:18px 20px;display:flex;align-items:flex-start;gap:14px;border-left:5px solid var(--ink3);transition:all 0.3s}
+.vtop.ok{border-left-color:var(--green);background:var(--gbg)}
+.vtop.warn{border-left-color:var(--amber);background:var(--abg)}
+.vtop.crit{border-left-color:var(--red);background:var(--rbg)}
+.vemo{font-size:26px;line-height:1;flex-shrink:0;margin-top:2px}
+.vtxt h2{font-family:'Lora',serif;font-size:17px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.vtxt p{font-size:12.5px;color:var(--ink2);line-height:1.6;font-weight:300}
+.vscore{display:flex;align-items:center;gap:16px;padding:12px 20px;border-top:1px solid var(--border);background:var(--s2)}
+.scorenum{font-family:'Lora',serif;font-size:30px;color:var(--ink);line-height:1;flex-shrink:0}
+.scorelbl{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;margin-top:1px}
+.scorebar-wrap{flex:1}
+.scorebar-txt{font-size:11px;color:var(--ink3);font-weight:300;margin-bottom:4px}
+.scorebar{height:7px;background:var(--border);border-radius:99px;overflow:hidden}
+.scorefill{height:100%;border-radius:99px;width:0%;transition:width 1s cubic-bezier(0.22,1,0.36,1),background 0.3s}
+.scorefill.ok{background:var(--green)}
+.scorefill.warn{background:var(--amber)}
+.scorefill.crit{background:var(--red)}
 
-  /* VERDICT CARD */
-  .verdict-banner {
-    border-radius: 12px;
-    padding: 18px 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    border-left: 4px solid var(--ink3);
-    background: var(--cream);
-    transition: all 0.4s ease;
-  }
-  .verdict-banner.ok { background: var(--green-light); border-left-color: var(--green); }
-  .verdict-banner.warn { background: var(--rust-light); border-left-color: var(--rust); }
-  .verdict-banner.crit { background: var(--red-light); border-left-color: var(--red); }
-  .verdict-icon {
-    font-size: 22px;
-    line-height: 1;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .verdict-title {
-    font-family: 'Instrument Serif', serif;
-    font-size: 17px;
-    font-weight: 400;
-    color: var(--ink);
-    margin-bottom: 4px;
-    line-height: 1.3;
-  }
-  .verdict-sub { font-size: 12.5px; color: var(--ink2); line-height: 1.55; font-weight: 300; }
+/* METRICS */
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 14px;box-shadow:var(--sh)}
+.mc-lbl{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px}
+.mc-val{font-size:21px;font-weight:600;color:var(--ink);font-family:'JetBrains Mono',monospace;letter-spacing:-0.5px}
+.mc-desc{font-size:11px;color:var(--ink3);font-weight:300;margin-top:2px;line-height:1.4;min-height:28px}
+.mc-bar{height:3px;background:var(--border);border-radius:99px;margin-top:8px;overflow:hidden}
+.mc-fill{height:100%;border-radius:99px;width:0%;transition:width 1s cubic-bezier(0.22,1,0.36,1)}
+.mc-fill.ok{background:var(--green)}
+.mc-fill.warn{background:var(--amber)}
+.mc-fill.crit{background:var(--red)}
 
-  /* METRICS */
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .metric {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-  }
-  .metric-label {
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    color: var(--ink3);
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin-bottom: 5px;
-  }
-  .metric-value {
-    font-size: 20px;
-    font-weight: 500;
-    color: var(--ink);
-    font-family: 'DM Mono', monospace;
-    letter-spacing: -0.5px;
-  }
-  .metric-bar {
-    height: 3px;
-    background: var(--border2);
-    border-radius: 99px;
-    margin-top: 8px;
-    overflow: hidden;
-  }
-  .metric-fill {
-    height: 100%;
-    border-radius: 99px;
-    background: var(--ink);
-    transition: width 1s cubic-bezier(0.22,1,0.36,1);
-    width: 0%;
-  }
-  .metric-fill.ok { background: var(--green); }
-  .metric-fill.warn { background: var(--rust); }
-  .metric-fill.crit { background: var(--red); }
+/* TWO-COL */
+.twocol{display:grid;grid-template-columns:1.1fr 0.9fr;gap:14px;margin-bottom:14px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--sh)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--s2);border-bottom:1px solid var(--border)}
+.panel-head-lbl{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em}
+.panel-body{padding:12px 14px}
 
-  /* HISTOGRAM */
-  #histCanvas { width: 100%; height: 72px; display: block; border-radius: 6px; }
+/* FINDINGS */
+.fi{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)}
+.fi:last-child{border-bottom:none;padding-bottom:0}
+.fidot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.fidot.ok{background:var(--green)}
+.fidot.warn{background:var(--amber)}
+.fidot.crit{background:var(--red)}
+.fitext{font-size:12px;color:var(--ink2);line-height:1.5}
+.fitag{font-family:'JetBrains Mono',monospace;font-size:9px;background:var(--s2);color:var(--ink3);padding:1px 5px;border-radius:4px;margin-right:4px;vertical-align:middle;border:1px solid var(--border)}
 
-  /* FINDINGS */
-  .findings-list { list-style: none; }
-  .finding-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12.5px;
-    color: var(--ink2);
-    line-height: 1.5;
-  }
-  .finding-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .finding-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    margin-top: 5px;
-    flex-shrink: 0;
-  }
-  .finding-dot.ok { background: var(--green); }
-  .finding-dot.warn { background: var(--rust); }
-  .finding-dot.crit { background: var(--red); }
-  .finding-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    background: var(--cream2);
-    color: var(--ink3);
-    padding: 1px 6px;
-    border-radius: 4px;
-    white-space: nowrap;
-    margin-right: 4px;
-    vertical-align: middle;
-  }
+/* SIGNALS */
+.sigrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);gap:8px}
+.sigrow:last-child{border-bottom:none}
+.sigk{font-size:11.5px;color:var(--ink3);font-weight:300}
+.sigv{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:500;color:var(--ink);text-align:right;flex-shrink:0}
+.sigv.ok{color:var(--green)}
+.sigv.warn{color:var(--amber)}
+.sigv.crit{color:var(--red)}
 
-  /* ANALYSIS TEXT */
-  .analysis-section { font-size: 13px; color: var(--ink2); line-height: 1.7; }
-  .analysis-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--border);
-    gap: 12px;
-  }
-  .analysis-row:last-child { border-bottom: none; }
-  .ar-key { color: var(--ink3); font-size: 12px; font-weight: 300; white-space: nowrap; }
-  .ar-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); text-align: right; }
-  .ar-val.ok { color: var(--green); }
-  .ar-val.warn { color: var(--rust); }
-  .ar-val.crit { color: var(--red); }
+/* DISCLAIMER */
+.disc{background:#fffce8;border:1px solid var(--abd);border-radius:12px;padding:13px 16px;font-size:12px;color:#6a5800;line-height:1.6;display:flex;gap:10px;margin-top:4px}
 
-  /* SCORE RING */
-  .score-ring-wrap {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 18px;
-    background: var(--cream);
-    border-bottom: 1px solid var(--border);
-  }
-  .ring-svg { flex-shrink: 0; }
-  .ring-text { }
-  .ring-score {
-    font-family: 'Instrument Serif', serif;
-    font-size: 36px;
-    color: var(--ink);
-    line-height: 1;
-  }
-  .ring-label { font-size: 11px; color: var(--ink3); margin-top: 2px; font-weight: 300; }
+/* ANIM */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp 0.4s ease forwards}
 
-  /* DISCLAIMER */
-  .disclaimer {
-    background: #fffbe6;
-    border: 1px solid #e8d87a;
-    border-radius: 12px;
-    padding: 14px 16px;
-    font-size: 12px;
-    color: #7a6600;
-    line-height: 1.6;
-    display: flex;
-    gap: 10px;
-  }
-  .disclaimer-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-
-  /* EMPTY STATE */
-  .empty-state {
-    text-align: center;
-    padding: 32px 16px;
-    color: var(--ink3);
-  }
-  .empty-state svg { opacity: 0.3; margin: 0 auto 12px; display: block; }
-  .empty-state p { font-size: 13px; font-weight: 300; }
-
-  /* PROGRESS BAR ANIMATION */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-in { animation: fadeUp 0.4s ease forwards; }
-
-  /* HIDDEN */
-  .hidden { display: none !important; }
-
-  @media (max-width: 700px) {
-    .main-grid { grid-template-columns: 1fr; }
-    .right-col { position: static; }
-    .preview-grid { grid-template-columns: 1fr; }
-    .preview-pane + .preview-pane { border-left: none; border-top: 1px solid var(--border); }
-    .metrics-grid { grid-template-columns: 1fr 1fr; }
-    .header { flex-direction: column; }
-  }
+@media(max-width:680px){
+  .prevgrid{grid-template-columns:1fr 1fr}
+  .mgrid{grid-template-columns:1fr 1fr}
+  .twocol{grid-template-columns:1fr}
+}
+@media(max-width:440px){
+  .prevgrid{grid-template-columns:1fr}
+  .prevpane+.prevpane{border-left:none;border-top:1px solid var(--border)}
+}
 </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-left">
-      <div class="logo-mark">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6">
-          <rect x="2" y="3" width="20" height="18" rx="2"/>
-          <ellipse cx="12" cy="12" rx="5" ry="4"/>
-          <path d="M12 8V5M12 19v-3M7 12H4M20 12h-3"/>
-        </svg>
-      </div>
-      <div class="header-title">
-        <h1>Pulmonary X-Ray Analyzer</h1>
-        <p>AI-assisted chest radiograph screening · Local processing, no data sent</p>
-      </div>
-    </div>
-    <div class="research-badge">⚠ Research Use Only</div>
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hlogo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7">
+      <rect x="2" y="3" width="20" height="18" rx="2.5"/>
+      <ellipse cx="12" cy="12" rx="4.5" ry="3.8"/>
+      <path d="M12 8.2V5.5M12 18.5v-2.7M7.5 12H5M19 12h-2.5"/>
+    </svg>
   </div>
+  <div class="htxt">
+    <h1>Chest X-Ray Analyzer</h1>
+    <p>Local pixel-level diagnostics · No data leaves your device · No external API</p>
+  </div>
+  <div class="hbadge">⚠ Research Use Only</div>
+</div>
 
-  <div class="main-grid">
+<!-- UPLOAD -->
+<div class="dropzone" id="dz">
+  <input type="file" id="fi" accept="image/*">
+  <div class="dico">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4c4840" stroke-width="1.8">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+  </div>
+  <h3>Drop your chest X-ray here or click to browse</h3>
+  <p>Standard PA or AP chest radiograph · any resolution</p>
+  <div class="ftags">
+    <span class="ftag">.png</span><span class="ftag">.jpg</span><span class="ftag">.jpeg</span>
+    <span class="ftag">.webp</span><span class="ftag">.bmp</span>
+  </div>
+</div>
 
-    <!-- LEFT COLUMN -->
-    <div class="left-col">
+<!-- FILE BAR -->
+<div class="filebar" id="fbar">
+  <div style="width:30px;height:30px;background:var(--s2);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4c4840" stroke-width="1.8"><rect x="2" y="3" width="20" height="18" rx="2"/><circle cx="12" cy="12" r="4"/></svg>
+  </div>
+  <span class="fbn" id="fbn">—</span>
+  <span class="fbs" id="fbs">—</span>
+  <button class="fbx" onclick="resetAll()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>
 
-      <!-- UPLOAD -->
-      <div class="upload-zone" id="uploadZone">
-        <input type="file" id="fileInput" accept="image/*">
-        <div class="upload-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a4640" stroke-width="1.8">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-        </div>
-        <h3>Drop chest X-ray here or click to browse</h3>
-        <p>PA or AP view recommended · DICOM preview, PNG, JPG supported</p>
-        <div class="file-tags">
-          <span class="file-tag">.png</span>
-          <span class="file-tag">.jpg</span>
-          <span class="file-tag">.jpeg</span>
-          <span class="file-tag">.webp</span>
-          <span class="file-tag">.bmp</span>
-        </div>
-      </div>
-
-      <!-- PREVIEW -->
-      <div class="card hidden" id="previewCard">
-        <div class="card-header">
-          <span class="card-header-title">Radiograph Preview</span>
-          <span id="fileInfo" style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace">—</span>
-        </div>
-        <div class="preview-grid">
-          <div class="preview-pane">
-            <label>Original</label>
-            <img id="originalImg" alt="X-ray">
-          </div>
-          <div class="preview-pane">
-            <label>Sobel Edge Map</label>
-            <canvas id="edgeCanvas"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- HISTOGRAM -->
-      <div class="card hidden" id="histCard">
-        <div class="card-header">
-          <span class="card-header-title">Pixel Intensity Histogram</span>
-          <span id="histStats" style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace">—</span>
-        </div>
-        <div class="card-body" style="padding:14px 18px">
-          <canvas id="histCanvas" height="72"></canvas>
-          <div style="display:flex;justify-content:space-between;margin-top:6px">
-            <span style="font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace">Dark (0)</span>
-            <span style="font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace">Mid (128)</span>
-            <span style="font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace">Bright (255)</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- BUTTONS -->
-      <div class="btn-row">
-        <button class="btn-analyze" id="analyzeBtn" disabled>
-          <div class="spinner"></div>
-          <span class="btn-lbl">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:5px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            Run Diagnostic Analysis
-          </span>
-        </button>
-        <button class="btn-reset hidden" id="resetBtn" onclick="resetAll()">Clear</button>
-      </div>
-
-      <!-- DISCLAIMER -->
-      <div class="disclaimer">
-        <span class="disclaimer-icon">⚠️</span>
-        <span><strong>For research purposes only.</strong> This tool performs pixel-level image analysis and cannot replace professional radiological assessment. All outputs must be reviewed by a licensed radiologist before clinical decisions are made.</span>
-      </div>
-
+<!-- PREVIEW -->
+<div class="prevwrap" id="pw">
+  <div class="prevcard">
+    <div class="prevhead">
+      <span class="prevhead-lbl">Image Processing Preview</span>
+      <span id="dims" style="font-size:10px;color:var(--ink3);font-family:'JetBrains Mono',monospace">—</span>
     </div>
-
-    <!-- RIGHT COLUMN -->
-    <div class="right-col">
-
-      <!-- VERDICT -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-header-title">Diagnosis</span>
-          <span id="analysisTime" style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace"></span>
-        </div>
-
-        <!-- Empty state -->
-        <div class="empty-state" id="emptyState">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-            <rect x="2" y="3" width="20" height="18" rx="2"/>
-            <circle cx="12" cy="12" r="4"/>
-            <path d="M12 8V6M12 18v-2M8 12H6M18 12h-2"/>
-          </svg>
-          <p>Upload an X-ray image and<br>click Analyze to begin</p>
-        </div>
-
-        <!-- Score ring + verdict -->
-        <div class="hidden" id="resultContent">
-          <div class="score-ring-wrap">
-            <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
-              <circle cx="36" cy="36" r="28" fill="none" stroke="#e4dccb" stroke-width="6"/>
-              <circle id="ringCircle" cx="36" cy="36" r="28" fill="none" stroke="#1c1a17" stroke-width="6"
-                stroke-dasharray="175.93" stroke-dashoffset="175.93"
-                stroke-linecap="round" transform="rotate(-90 36 36)"
-                style="transition: stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1), stroke 0.4s ease"/>
-              <text id="ringPct" x="36" y="41" text-anchor="middle" font-family="'Instrument Serif', serif"
-                font-size="16" fill="#1c1a17">—</text>
-            </svg>
-            <div class="ring-text">
-              <div class="ring-score" id="abnScore">—</div>
-              <div class="ring-label">Abnormality Score / 100</div>
-            </div>
-          </div>
-
-          <div class="card-body" style="padding:14px 18px">
-            <div class="verdict-banner" id="verdictBanner">
-              <div class="verdict-icon" id="vIcon">—</div>
-              <div>
-                <div class="verdict-title" id="vTitle">Awaiting analysis</div>
-                <div class="verdict-sub" id="vSub">—</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- METRICS -->
-      <div class="card hidden" id="metricsCard">
-        <div class="card-header"><span class="card-header-title">Radiometric Indicators</span></div>
-        <div class="card-body">
-          <div class="metrics-grid">
-            <div class="metric">
-              <div class="metric-label">Edge Density</div>
-              <div class="metric-value" id="mEdge">—</div>
-              <div class="metric-bar"><div class="metric-fill" id="bEdge"></div></div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Opacity</div>
-              <div class="metric-value" id="mOp">—</div>
-              <div class="metric-bar"><div class="metric-fill" id="bOp"></div></div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Homogeneity</div>
-              <div class="metric-value" id="mHom">—</div>
-              <div class="metric-bar"><div class="metric-fill" id="bHom"></div></div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Asymmetry</div>
-              <div class="metric-value" id="mAsym">—</div>
-              <div class="metric-bar"><div class="metric-fill" id="bAsym"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- DETAILED ANALYSIS -->
-      <div class="card hidden" id="analysisCard">
-        <div class="card-header"><span class="card-header-title">Signal Analysis</span></div>
-        <div class="card-body">
-          <div class="analysis-section" id="analysisRows"></div>
-        </div>
-      </div>
-
-      <!-- FINDINGS -->
-      <div class="card hidden" id="findingsCard">
-        <div class="card-header"><span class="card-header-title">Clinical Observations</span></div>
-        <div class="card-body" style="padding-top:10px;padding-bottom:10px">
-          <ul class="findings-list" id="findingsList"></ul>
-        </div>
-      </div>
-
+    <div class="prevgrid">
+      <div class="prevpane"><label>Original</label><img id="oi" alt="X-ray"></div>
+      <div class="prevpane"><label>Sobel Edge Map</label><canvas id="ec"></canvas></div>
+      <div class="prevpane"><label>Histogram Equalised</label><canvas id="cc"></canvas></div>
     </div>
   </div>
 </div>
 
+<!-- HISTOGRAM -->
+<div class="histwrap" id="hw">
+  <div class="histhead">
+    <span class="histhead-lbl">Pixel Intensity Distribution</span>
+    <span id="hinfo" style="font-size:10px;color:var(--ink3);font-family:'JetBrains Mono',monospace">—</span>
+  </div>
+  <div class="histbody">
+    <canvas id="histCanvas" height="76"></canvas>
+    <div class="haxis">
+      <span>0 · black</span><span>64</span><span>128 · mid</span><span>192</span><span>255 · white</span>
+    </div>
+  </div>
+</div>
+
+<!-- BUTTONS -->
+<div class="btnrow">
+  <button class="btnA" id="aBtn" disabled>
+    <div class="spin"></div>
+    <span class="btxt">Run Diagnostic Analysis</span>
+  </button>
+  <button class="btnR" id="rBtn" onclick="resetAll()">Clear</button>
+</div>
+
+<!-- RESULTS -->
+<div class="results" id="res">
+
+  <div class="vcard fu">
+    <div class="vtop" id="vtop">
+      <div class="vemo" id="vemo">—</div>
+      <div class="vtxt"><h2 id="vtitle">—</h2><p id="vsub">—</p></div>
+    </div>
+    <div class="vscore">
+      <div>
+        <div class="scorenum" id="snum">—</div>
+        <div class="scorelbl">Score / 100</div>
+      </div>
+      <div class="scorebar-wrap">
+        <div class="scorebar-txt" id="sbartxt">—</div>
+        <div class="scorebar"><div class="scorefill" id="sfill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mgrid">
+    <div class="mc"><div class="mc-lbl">Opacity</div><div class="mc-val" id="mv1">—</div><div class="mc-desc" id="md1">—</div><div class="mc-bar"><div class="mc-fill" id="mb1"></div></div></div>
+    <div class="mc"><div class="mc-lbl">Edge Density</div><div class="mc-val" id="mv2">—</div><div class="mc-desc" id="md2">—</div><div class="mc-bar"><div class="mc-fill" id="mb2"></div></div></div>
+    <div class="mc"><div class="mc-lbl">Homogeneity</div><div class="mc-val" id="mv3">—</div><div class="mc-desc" id="md3">—</div><div class="mc-bar"><div class="mc-fill" id="mb3"></div></div></div>
+    <div class="mc"><div class="mc-lbl">Asymmetry</div><div class="mc-val" id="mv4">—</div><div class="mc-desc" id="md4">—</div><div class="mc-bar"><div class="mc-fill" id="mb4"></div></div></div>
+  </div>
+
+  <div class="twocol">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-head-lbl">Clinical Observations</span>
+        <span id="flagCount" style="font-size:10px;color:var(--ink3);font-family:'JetBrains Mono',monospace"></span>
+      </div>
+      <div class="panel-body" id="fb"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="panel-head-lbl">Signal Analysis</span></div>
+      <div class="panel-body" id="sb"></div>
+    </div>
+  </div>
+
+  <div class="disc">
+    <span style="font-size:16px;flex-shrink:0">⚠️</span>
+    <span><strong>For research and educational use only.</strong> This tool performs local pixel-level image processing. It does NOT use machine learning or trained models and cannot substitute for professional radiology. All outputs must be reviewed by a licensed radiologist or physician before any clinical decision is made. No data is uploaded — analysis runs entirely in your browser.</span>
+  </div>
+
+</div>
+</div>
+
 <script>
-// ── DOM refs ──────────────────────────────────────────────────────────
-const uploadZone  = document.getElementById('uploadZone');
-const fileInput   = document.getElementById('fileInput');
-const previewCard = document.getElementById('previewCard');
-const histCard    = document.getElementById('histCard');
-const analyzeBtn  = document.getElementById('analyzeBtn');
-const resetBtn    = document.getElementById('resetBtn');
-const originalImg = document.getElementById('originalImg');
-const edgeCv      = document.getElementById('edgeCanvas');
-const ectx        = edgeCv.getContext('2d');
-const histCv      = document.getElementById('histCanvas');
-const hctx        = histCv.getContext('2d');
+var G,S,IW,IH;
+var ec=document.getElementById('ec'),ectx=ec.getContext('2d');
+var cc=document.getElementById('cc'),cctx=cc.getContext('2d');
+var hc=document.getElementById('histCanvas'),hctx=hc.getContext('2d');
 
-let grayData = null, sobelData = null, imgW = 0, imgH = 0;
+// drag/drop
+var dz=document.getElementById('dz'), fi=document.getElementById('fi');
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over')});
+dz.addEventListener('dragleave',function(){dz.classList.remove('over')});
+dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('over');var f=e.dataTransfer.files[0];if(f&&f.type.match(/image/))load(f)});
+fi.addEventListener('change',function(){if(fi.files[0])load(fi.files[0])});
 
-// ── Drag-drop ─────────────────────────────────────────────────────────
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) loadFile(f); });
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
-
-function loadFile(f) {
-  document.getElementById('fileInfo').textContent = f.name.length > 22 ? f.name.slice(0,20)+'…' : f.name;
-  const r = new FileReader();
-  r.onload = e => {
-    const im = new Image();
-    im.onload = () => {
-      originalImg.src = e.target.result;
-      imgW = im.width; imgH = im.height;
-      processLocally(im);
-      previewCard.classList.remove('hidden');
-      histCard.classList.remove('hidden');
-      analyzeBtn.disabled = false;
-      resetBtn.classList.remove('hidden');
+function load(f){
+  document.getElementById('fbn').textContent=f.name.length>26?f.name.slice(0,24)+'…':f.name;
+  document.getElementById('fbs').textContent=(f.size/1024).toFixed(1)+' KB';
+  document.getElementById('fbar').classList.add('on');
+  var r=new FileReader();
+  r.onload=function(e){
+    var im=new Image();
+    im.onload=function(){
+      IW=im.width; IH=im.height;
+      document.getElementById('dims').textContent=IW+'×'+IH;
+      document.getElementById('oi').src=e.target.result;
+      process(im);
+      document.getElementById('pw').classList.add('on');
+      document.getElementById('hw').classList.add('on');
+      document.getElementById('aBtn').disabled=false;
+      document.getElementById('rBtn').style.display='block';
+      document.getElementById('res').style.display='none';
     };
-    im.src = e.target.result;
+    im.src=e.target.result;
   };
   r.readAsDataURL(f);
 }
 
-// ── Local image processing ────────────────────────────────────────────
-function processLocally(im) {
-  const tmp = document.createElement('canvas');
-  tmp.width = imgW; tmp.height = imgH;
-  const tc = tmp.getContext('2d');
-  tc.drawImage(im, 0, 0);
-  const id = tc.getImageData(0, 0, imgW, imgH);
-  grayData = computeGray(id.data);
-  sobelData = computeSobel(grayData, imgW, imgH);
-  drawEdgeMap();
-  drawHistogram();
+function process(im){
+  var tmp=document.createElement('canvas');
+  tmp.width=IW; tmp.height=IH;
+  var tc=tmp.getContext('2d');
+  tc.drawImage(im,0,0);
+  var id=tc.getImageData(0,0,IW,IH);
+  // grayscale
+  G=new Float32Array(IW*IH);
+  for(var i=0;i<G.length;i++){var o=i*4;G[i]=0.299*id.data[o]+0.587*id.data[o+1]+0.114*id.data[o+2];}
+  // sobel
+  S=sobel(G,IW,IH);
+  // edge map
+  ec.width=IW; ec.height=IH;
+  var mx=0; for(var i=0;i<S.length;i++) if(S[i]>mx)mx=S[i];
+  if(mx===0)mx=1;
+  var ed=ectx.createImageData(IW,IH);
+  for(var i=0;i<S.length;i++){var v=Math.min(255,S[i]/mx*255*1.8);ed.data[i*4]=v;ed.data[i*4+1]=v;ed.data[i*4+2]=v;ed.data[i*4+3]=255;}
+  ectx.putImageData(ed,0,0);
+  // equalised
+  heq(G,IW,IH);
+  // histogram
+  drawHist(G);
 }
 
-function computeGray(data) {
-  const g = new Float32Array(data.length / 4);
-  for (let i = 0; i < g.length; i++) {
-    const o = i * 4;
-    g[i] = 0.299 * data[o] + 0.587 * data[o+1] + 0.114 * data[o+2];
-  }
-  return g;
-}
-
-function computeSobel(g, w, h) {
-  const out = new Float32Array(w * h);
-  const kx = [[-1,0,1],[-2,0,2],[-1,0,1]];
-  const ky = [[-1,-2,-1],[0,0,0],[1,2,1]];
-  for (let y = 1; y < h-1; y++) {
-    for (let x = 1; x < w-1; x++) {
-      let px = 0, py = 0;
-      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-        const v = g[(y+dy)*w+(x+dx)];
-        px += v * kx[dy+1][dx+1];
-        py += v * ky[dy+1][dx+1];
-      }
-      out[y*w+x] = Math.sqrt(px*px + py*py);
-    }
+function sobel(g,w,h){
+  var out=new Float32Array(w*h);
+  var kx=[[-1,0,1],[-2,0,2],[-1,0,1]],ky=[[-1,-2,-1],[0,0,0],[1,2,1]];
+  for(var y=1;y<h-1;y++) for(var x=1;x<w-1;x++){
+    var px=0,py=0;
+    for(var dy=-1;dy<=1;dy++) for(var dx=-1;dx<=1;dx++){var v=g[(y+dy)*w+(x+dx)];px+=v*kx[dy+1][dx+1];py+=v*ky[dy+1][dx+1];}
+    out[y*w+x]=Math.sqrt(px*px+py*py);
   }
   return out;
 }
 
-function drawEdgeMap() {
-  edgeCv.width = imgW; edgeCv.height = imgH;
-  let mx = 0;
-  for (let i = 0; i < sobelData.length; i++) if (sobelData[i] > mx) mx = sobelData[i];
-  const id = ectx.createImageData(imgW, imgH);
-  for (let i = 0; i < sobelData.length; i++) {
-    const v = Math.min(255, (sobelData[i] / mx) * 255 * 1.6);
-    id.data[i*4] = v; id.data[i*4+1] = v; id.data[i*4+2] = v; id.data[i*4+3] = 255;
-  }
-  ectx.putImageData(id, 0, 0);
+function heq(g,w,h){
+  var hist=new Array(256).fill(0);
+  for(var i=0;i<g.length;i++) hist[Math.min(255,Math.floor(g[i]))]++;
+  var cdf=0,lut=[];
+  for(var i=0;i<256;i++){cdf+=hist[i];lut.push(cdf);}
+  var cmin=lut.find(function(v){return v>0})||1;
+  var N=g.length;
+  var lut2=lut.map(function(v){return Math.round((v-cmin)/(N-cmin)*255);});
+  cc.width=w; cc.height=h;
+  var id2=cctx.createImageData(w,h);
+  for(var i=0;i<g.length;i++){var v=lut2[Math.min(255,Math.floor(g[i]))];id2.data[i*4]=v;id2.data[i*4+1]=v;id2.data[i*4+2]=v;id2.data[i*4+3]=255;}
+  cctx.putImageData(id2,0,0);
 }
 
-function drawHistogram() {
-  const hist = new Array(256).fill(0);
-  for (let i = 0; i < grayData.length; i++) hist[Math.min(255, Math.floor(grayData[i]))]++;
-  const mx = Math.max(...hist);
-  const W = histCv.width = histCv.offsetWidth || 500;
-  const H = 72; histCv.height = H;
-  hctx.clearRect(0, 0, W, H);
-  const bw = W / 256;
-
-  // Dark region (0-85): deep teal
-  // Mid region (85-170): warm sand
-  // Bright region (170-255): warm rust
-  for (let i = 0; i < 256; i++) {
-    const bh = Math.max(1, (hist[i] / mx) * H * 0.92);
-    if (i < 85) hctx.fillStyle = `rgba(30,80,110,${0.5+0.4*(i/85)})`;
-    else if (i < 170) hctx.fillStyle = `rgba(120,100,70,${0.5+0.3*((i-85)/85)})`;
-    else hctx.fillStyle = `rgba(160,75,35,${0.4+0.4*((i-170)/85)})`;
-    hctx.fillRect(i * bw, H - bh, bw + 0.3, bh);
+function drawHist(g){
+  var hist=new Array(256).fill(0);
+  for(var i=0;i<g.length;i++) hist[Math.min(255,Math.floor(g[i]))]++;
+  var mx=0; for(var i=0;i<256;i++) if(hist[i]>mx)mx=hist[i];
+  if(mx===0)mx=1;
+  var W=hc.width=hc.offsetWidth||640, H=76; hc.height=H;
+  hctx.clearRect(0,0,W,H);
+  var bw=W/256;
+  for(var i=0;i<256;i++){
+    var bh=Math.max(2,hist[i]/mx*H*0.94);
+    var t=i/255, r2,g2,b2;
+    if(t<0.33){r2=30+Math.round(t/0.33*50);g2=60+Math.round(t/0.33*60);b2=120-Math.round(t/0.33*30);}
+    else if(t<0.66){var u=(t-0.33)/0.33;r2=80+Math.round(u*60);g2=120-Math.round(u*30);b2=90-Math.round(u*40);}
+    else{var u=(t-0.66)/0.34;r2=140+Math.round(u*100);g2=90-Math.round(u*50);b2=50-Math.round(u*20);}
+    hctx.fillStyle='rgba('+r2+','+g2+','+b2+',0.8)';
+    hctx.fillRect(i*bw,H-bh,bw+0.3,bh);
   }
-
-  // Stats
-  let sum = 0, cnt = 0;
-  for (let i = 0; i < 256; i++) { sum += i * hist[i]; cnt += hist[i]; }
-  const mean = sum / cnt;
-  document.getElementById('histStats').textContent = `mean: ${Math.round(mean)} · pixels: ${cnt.toLocaleString()}`;
+  var sum=0,cnt2=0; for(var i=0;i<256;i++){sum+=i*hist[i];cnt2+=hist[i];}
+  var mean=cnt2?sum/cnt2:0;
+  var var2=0; for(var i=0;i<256;i++) var2+=hist[i]*Math.pow(i-mean,2); var2=cnt2?var2/cnt2:0;
+  document.getElementById('hinfo').textContent='mean:'+Math.round(mean)+'  sd:'+Math.round(Math.sqrt(var2))+'  total:'+cnt2.toLocaleString();
 }
 
-// ── Diagnostic engine ─────────────────────────────────────────────────
-analyzeBtn.addEventListener('click', () => {
-  if (!grayData) return;
-  analyzeBtn.classList.add('analyzing');
-  analyzeBtn.disabled = true;
-  const t0 = performance.now();
-  setTimeout(() => {
-    const res = runDiagnostics();
-    renderResults(res);
-    const ms = Math.round(performance.now() - t0);
-    document.getElementById('analysisTime').textContent = `${ms}ms`;
-    analyzeBtn.classList.remove('analyzing');
-    analyzeBtn.disabled = false;
+// ANALYZE
+document.getElementById('aBtn').addEventListener('click',function(){
+  if(!G)return;
+  var btn=document.getElementById('aBtn');
+  btn.classList.add('running'); btn.disabled=true;
+  setTimeout(function(){
+    try{
+      var r=diagnose();
+      render(r);
+      document.getElementById('res').style.display='block';
+      document.getElementById('res').scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(err){
+      alert('Analysis error: '+err.message);
+    }
+    btn.classList.remove('running'); btn.disabled=false;
   }, 600);
 });
 
-function runDiagnostics() {
-  const g = grayData, s = sobelData, N = g.length;
+function diagnose(){
+  var g=G, s=S, N=g.length, W=IW, H=IH;
 
-  // ── 1. Basic statistics ──
-  let sumG = 0, sumGsq = 0;
-  let dark = 0, midDark = 0, mid = 0, bright = 0, vBright = 0;
-  for (let i = 0; i < N; i++) {
-    const v = g[i];
-    sumG += v; sumGsq += v * v;
-    if (v < 40) dark++;
-    else if (v < 80) midDark++;
-    else if (v < 150) mid++;
-    else if (v < 210) bright++;
-    else vBright++;
+  // 1. INTENSITY STATS
+  var sum=0,sum2=0;
+  for(var i=0;i<N;i++){var v=g[i];sum+=v;sum2+=v*v;}
+  var mean=sum/N, variance=sum2/N-mean*mean, sd=Math.sqrt(variance);
+
+  // Bucket counts
+  var hist=new Array(256).fill(0);
+  for(var i=0;i<N;i++) hist[Math.min(255,Math.floor(g[i]))]++;
+
+  var p=function(a,b){var c=0;for(var i=a;i<=b;i++)c+=hist[i];return c/N;};
+  var pVD=p(0,50);    // very dark 0-50
+  var pD=p(51,110);   // dark 51-110
+  var pM=p(111,160);  // mid 111-160
+  var pB=p(161,210);  // bright 161-210
+  var pVB=p(211,255); // very bright 211-255
+
+  // 2. HISTOGRAM PEAKS
+  var sm=hist.map(function(_,i){var s2=0,c=0;for(var d=-7;d<=7;d++)if(i+d>=0&&i+d<256){s2+=hist[i+d];c++;}return s2/c;});
+  var peaks=[];
+  for(var i=5;i<251;i++){
+    if(sm[i]>sm[i-3]&&sm[i]>sm[i-1]&&sm[i]>sm[i+1]&&sm[i]>sm[i+3]&&sm[i]>N*0.003) peaks.push(i);
   }
-  const mean = sumG / N;
-  const variance = sumGsq / N - mean * mean;
-  const stdDev = Math.sqrt(variance);
+  var bimodal=peaks.length>=2;
 
-  const pDark     = dark / N;
-  const pMidDark  = midDark / N;
-  const pMid      = mid / N;
-  const pBright   = bright / N;
-  const pVBright  = vBright / N;
+  // 3. EDGE DENSITY
+  var esum=0,estrong=0;
+  for(var i=0;i<s.length;i++){esum+=s[i];if(s[i]>90)estrong++;}
+  var edgeDens=Math.min(100,Math.round(esum/(s.length*160)*450));
+  var strongRatio=estrong/s.length;
 
-  // ── 2. Histogram analysis ──
-  const hist = new Array(256).fill(0);
-  for (let i = 0; i < N; i++) hist[Math.min(255, Math.floor(g[i]))]++;
-
-  // Smooth histogram for peak detection
-  const sm = hist.map((_, i) => {
-    let s2 = 0, c = 0;
-    for (let d = -5; d <= 5; d++) { if (i+d >= 0 && i+d < 256) { s2 += hist[i+d]; c++; } }
-    return s2 / c;
-  });
-  let peaks = 0, peakPositions = [];
-  for (let i = 3; i < 253; i++) {
-    if (sm[i] > sm[i-1] && sm[i] > sm[i-2] && sm[i] > sm[i+1] && sm[i] > sm[i+2] && sm[i] > N * 0.005) {
-      peaks++;
-      peakPositions.push(i);
-    }
+  // 4. TEXTURE (block variance)
+  var bsz=20,bvars=[];
+  for(var by=0;by+bsz<H;by+=bsz) for(var bx=0;bx+bsz<W;bx+=bsz){
+    var bs=0,bs2=0,bc=0;
+    for(var dy=0;dy<bsz;dy++) for(var dx=0;dx<bsz;dx++){var v2=g[(by+dy)*W+(bx+dx)];bs+=v2;bs2+=v2*v2;bc++;}
+    var bm=bs/bc; bvars.push(Math.max(0,bs2/bc-bm*bm));
   }
-  const bimodal = peaks >= 2;
+  bvars.sort(function(a,b){return a-b;});
+  var medVar=bvars[Math.floor(bvars.length/2)]||0;
+  var homog=Math.max(0,Math.min(100,100-Math.round(Math.sqrt(medVar)/1.2)));
+  var patchyCount=bvars.filter(function(v){return v>1400;}).length;
+  var patchy=bvars.length>0 && patchyCount/bvars.length>0.28;
 
-  // Dark cluster prominence (consolidation = large dark region)
-  const darkCluster = hist.slice(0, 70).reduce((a, b) => a + b, 0) / N;
-  const consolidationProxy = darkCluster > 0.30;
-
-  // ── 3. Edge analysis ──
-  let edgeSum = 0, highEdgePx = 0;
-  for (let i = 0; i < s.length; i++) {
-    edgeSum += s[i];
-    if (s[i] > 60) highEdgePx++;
+  // 5. ASYMMETRY
+  var roiY0=Math.floor(H*0.18),roiY1=Math.floor(H*0.82);
+  var hw2=Math.floor(W/2), mg=Math.max(4,Math.floor(W*0.04));
+  var ls=0,rs=0,lc=0,rc=0;
+  for(var y=roiY0;y<roiY1;y++){
+    for(var x=mg;x<hw2-mg;x++){ls+=g[y*W+x];lc++;}
+    for(var x=hw2+mg;x<W-mg;x++){rs+=g[y*W+x];rc++;}
   }
-  const edgeDensity = Math.min(100, Math.round((edgeSum / (s.length * 200)) * 600));
-  const highEdgeRatio = highEdgePx / s.length;
+  var lm=lc?ls/lc:128, rm=rc?rs/rc:128;
+  var asymmAbs=Math.abs(lm-rm);
+  var asymmPct=Math.min(100,Math.round(asymmAbs/255*600));
+  var heavySide=lm<rm?'left':'right';
 
-  // ── 4. Regional texture (block variance) ──
-  const bsz = 20;
-  let blockVars = [];
-  for (let by = 0; by + bsz < imgH; by += bsz) {
-    for (let bx = 0; bx + bsz < imgW; bx += bsz) {
-      let bs = 0, bss = 0, bc = 0;
-      for (let dy = 0; dy < bsz; dy++) for (let dx = 0; dx < bsz; dx++) {
-        const v = g[(by+dy)*imgW+(bx+dx)]; bs += v; bss += v*v; bc++;
-      }
-      const bm = bs/bc; blockVars.push(bss/bc - bm*bm);
-    }
+  // 6. CENTRAL / HILAR
+  var cx0=Math.floor(W*0.34),cx1=Math.floor(W*0.66);
+  var cy0=Math.floor(H*0.22),cy1=Math.floor(H*0.78);
+  var cs=0,cc2=0;
+  for(var y=cy0;y<cy1;y++) for(var x=cx0;x<cx1;x++){cs+=g[y*W+x];cc2++;}
+  var centralM=cc2?cs/cc2:128;
+  var centralOpaque=centralM<82;
+
+  // 7. LOWER ZONE
+  var lzY=Math.floor(H*0.65);
+  var lzs=0,lzc=0;
+  for(var y=lzY;y<H;y++) for(var x=Math.floor(W*0.1);x<Math.floor(W*0.9);x++){lzs+=g[y*W+x];lzc++;}
+  var lowerM=lzc?lzs/lzc:128;
+  var lowerOpaque=lowerM<82;
+
+  // 8. BRIGHT PATCH DETECTOR (consolidation = bright white areas in lung field)
+  var bpCount=0,bpTotal=0;
+  for(var y=roiY0;y<roiY1;y++) for(var x=Math.floor(W*0.08);x<Math.floor(W*0.92);x++){
+    var v3=g[y*W+x];
+    if(v3>158) bpCount++;
+    bpTotal++;
   }
-  blockVars.sort((a,b) => a-b);
-  const medBlockVar = blockVars[Math.floor(blockVars.length/2)];
-  const homogeneity = Math.max(0, 100 - Math.round(Math.sqrt(medBlockVar) / 1.1));
+  var bpRatio=bpTotal?bpCount/bpTotal:0;
+  var hasConsolid=bpRatio>0.10;
 
-  // ── 5. Left-right asymmetry ──
-  let lSum = 0, rSum = 0;
-  const halfW = Math.floor(imgW / 2);
-  for (let y = Math.floor(imgH*0.15); y < Math.floor(imgH*0.85); y++) {
-    for (let x = 10; x < halfW-10; x++) lSum += g[y*imgW+x];
-    for (let x = halfW+10; x < imgW-10; x++) rSum += g[y*imgW+x];
-  }
-  const lMean = lSum / ((imgH*0.7)*(halfW-20));
-  const rMean = rSum / ((imgH*0.7)*(imgW-halfW-20));
-  const asymmRaw = Math.abs(lMean - rMean);
-  const asymmScore = Math.min(100, Math.round(asymmRaw / 255 * 600));
-  const leftDarker = lMean < rMean;
+  // 9. OPACITY SCORE (weighted)
+  // Pneumonia on X-ray = white patches (bright)
+  // We weight: very bright most, then bright, then very dark (inverted/bone)
+  var opScore=Math.min(100,Math.round(pVB*90+pB*35+pVD*15+bpRatio*60));
 
-  // ── 6. Central opacity (hilar region proxy) ──
-  const cx0 = Math.floor(imgW * 0.35), cx1 = Math.floor(imgW * 0.65);
-  const cy0 = Math.floor(imgH * 0.25), cy1 = Math.floor(imgH * 0.75);
-  let cSum = 0, cCnt = 0;
-  for (let y = cy0; y < cy1; y++) for (let x = cx0; x < cx1; x++) { cSum += g[y*imgW+x]; cCnt++; }
-  const centralMean = cSum / cCnt;
-  const centralDark = centralMean < 80;
+  // 10. COMPOSITE
+  var score=0;
+  if(opScore>52) score+=26; else if(opScore>35) score+=14; else if(opScore>20) score+=6;
+  if(edgeDens>60) score+=16; else if(edgeDens>42) score+=8; else if(edgeDens>28) score+=3;
+  if(hasConsolid) score+=18;
+  if(bimodal) score+=10;
+  if(asymmPct>16) score+=14; else if(asymmPct>9) score+=7;
+  if(homog<40) score+=10; else if(homog<55) score+=5;
+  if(centralOpaque) score+=8;
+  if(lowerOpaque) score+=9;
+  if(patchy) score+=7;
+  score=Math.min(100,Math.round(score));
 
-  // ── 7. Peripheral vs central density ratio ──
-  let periSum = 0, periCnt = 0;
-  for (let y = 0; y < imgH; y++) for (let x = 0; x < imgW; x++) {
-    const isPeripheral = x < imgW*0.15 || x > imgW*0.85 || y < imgH*0.1 || y > imgH*0.9;
-    if (isPeripheral) { periSum += g[y*imgW+x]; periCnt++; }
-  }
-  const periMean = periSum / periCnt;
-  const periCentralRatio = centralMean > 0 ? periMean / centralMean : 1;
-
-  // ── 8. Opacity score ──
-  const opScore = Math.round((pDark + pMidDark * 0.5) * 100);
-
-  // ── 9. Composite abnormality score ──
-  let abn = 0;
-  // Opacity signals
-  if (opScore > 45) abn += 28;
-  else if (opScore > 30) abn += 16;
-  else if (opScore > 18) abn += 8;
-
-  // Edge signals
-  if (edgeDensity > 60) abn += 20;
-  else if (edgeDensity > 45) abn += 12;
-  else if (edgeDensity > 30) abn += 6;
-
-  // Histogram signals
-  if (bimodal) abn += 12;
-  if (consolidationProxy) abn += 14;
-
-  // Asymmetry
-  if (asymmScore > 15) abn += 14;
-  else if (asymmScore > 8) abn += 7;
-
-  // Homogeneity
-  if (homogeneity < 40) abn += 12;
-  else if (homogeneity < 55) abn += 6;
-
-  abn = Math.min(100, Math.round(abn));
-
-  // ── 10. Build clinical interpretation ──
-  const interpretation = buildInterpretation({
-    abn, opScore, edgeDensity, homogeneity, asymmScore, bimodal,
-    consolidationProxy, centralDark, leftDarker, mean, stdDev,
-    pDark, pBright, pVBright, highEdgeRatio, periCentralRatio
-  });
-
-  return {
-    abn, opScore, edgeDensity, homogeneity, asymmScore,
-    mean, stdDev, bimodal, consolidationProxy, centralDark,
-    leftDarker, peakPositions, peaks, interpretation
-  };
+  return {score,opScore,edgeDens,homog,asymmPct,mean,sd,bimodal,peaks,hasConsolid,bpRatio,centralOpaque,lowerOpaque,patchy,heavySide,pVD,pD,pM,pB,pVB,strongRatio};
 }
 
-function buildInterpretation(p) {
-  let verdict, vClass, icon, title, summary;
-  const findings = [];
-  const analysisRows = [];
+function render(r){
+  var s=r.score;
+  var cls=s>=62?'crit':s>=36?'warn':'ok';
+  var emo=s>=62?'🚨':s>=36?'⚠️':'✅';
+  var title=s>=62?'Significant Abnormality Detected':s>=36?'Possible Abnormality — Clinical Correlation Advised':'No Significant Abnormality Detected';
+  var sub=s>=62?
+    'Multiple strong radiometric signals detected (composite score '+s+'/100). Pattern is consistent with consolidation, dense infiltrate, or significant pulmonary opacity. Immediate radiologist review is strongly recommended.':
+    s>=36?
+    'Moderate radiometric abnormality signals present (score '+s+'/100). Findings suggest possible partial opacity, early infiltrate, or atelectasis. Clinical correlation and follow-up imaging are advised.':
+    'Radiometric indicators are within expected normal range (score '+s+'/100). Lung fields appear relatively clear with no dominant consolidation signal. Routine clinical follow-up as appropriate.';
 
-  if (p.abn >= 62) {
-    verdict = 'CRITICAL';
-    vClass = 'crit';
-    icon = '🚨';
-    title = 'Significant Abnormality Detected';
-    summary = `Multiple radiometric markers are strongly elevated (composite score ${p.abn}/100). Pattern is consistent with consolidation or dense infiltrate. Urgent radiologist review is recommended.`;
-  } else if (p.abn >= 38) {
-    verdict = 'POSSIBLE';
-    vClass = 'warn';
-    icon = '⚠️';
-    title = 'Possible Abnormality — Correlate Clinically';
-    summary = `Moderate radiometric abnormality signals detected (score ${p.abn}/100). Findings suggest possible opacity or partial infiltrate. Clinical correlation and follow-up imaging advised.`;
-  } else {
-    verdict = 'NORMAL';
-    vClass = 'ok';
-    icon = '✅';
-    title = 'No Significant Abnormality Detected';
-    summary = `Radiometric indicators are within normal range (score ${p.abn}/100). Lung fields appear relatively clear. Routine follow-up as clinically appropriate.`;
-  }
+  // verdict
+  var vt=document.getElementById('vtop');
+  vt.className='vtop '+cls;
+  document.getElementById('vemo').textContent=emo;
+  document.getElementById('vtitle').textContent=title;
+  document.getElementById('vsub').textContent=sub;
+  document.getElementById('snum').textContent=s;
+  document.getElementById('sbartxt').textContent=s>=62?'High abnormality — urgent review':s>=36?'Moderate signals — correlate clinically':'Normal range — no urgent action';
+  var sf=document.getElementById('sfill');
+  sf.className='scorefill '+cls;
+  sf.style.width='0%';
+  setTimeout(function(){sf.style.width=s+'%';},80);
 
-  // Lung field clarity
-  if (p.opScore > 40) findings.push({ sev: 'crit', label: 'OPACITY', text: `High opacity score (${p.opScore}%) — dense dark regions detected, possible consolidation or infiltrate.` });
-  else if (p.opScore > 22) findings.push({ sev: 'warn', label: 'OPACITY', text: `Moderate opacity (${p.opScore}%) — mild increased density in lung fields.` });
-  else findings.push({ sev: 'ok', label: 'OPACITY', text: `Opacity score normal (${p.opScore}%) — lung fields appear clear.` });
+  // metrics
+  setMC(1, r.opScore+'%', r.opScore, r.opScore>50?'crit':r.opScore>28?'warn':'ok',
+    r.opScore>50?'High — possible consolidation':r.opScore>28?'Elevated — monitor':'Normal range');
+  setMC(2, r.edgeDens+'%', r.edgeDens, r.edgeDens>58?'warn':r.edgeDens>38?'warn':'ok',
+    r.edgeDens>58?'High edge activity':r.edgeDens>38?'Moderate edges':'Normal soft edges');
+  setMC(3, r.homog+'%', r.homog, r.homog<42?'warn':r.homog<58?'warn':'ok',
+    r.homog<42?'Low — patchy texture':r.homog<58?'Moderate variation':'Uniform field');
+  setMC(4, r.asymmPct+'%', r.asymmPct, r.asymmPct>16?'crit':r.asymmPct>9?'warn':'ok',
+    r.asymmPct>16?r.heavySide+' lung denser':r.asymmPct>9?'Mild asymmetry':'Symmetric fields');
 
-  // Asymmetry
-  if (p.asymmScore > 14) findings.push({ sev: 'crit', label: 'ASYMMETRY', text: `Notable left-right asymmetry (${p.asymmScore}%) — ${p.leftDarker ? 'left' : 'right'} lung field denser, may indicate unilateral infiltrate.` });
-  else if (p.asymmScore > 7) findings.push({ sev: 'warn', label: 'ASYMMETRY', text: `Mild asymmetry (${p.asymmScore}%) — slight density difference between lung fields.` });
-  else findings.push({ sev: 'ok', label: 'ASYMMETRY', text: `Symmetric density distribution (${p.asymmScore}%) — bilateral fields appear balanced.` });
+  // findings
+  var finds=[
+    {sev:r.opScore>50?'crit':r.opScore>28?'warn':'ok',tag:'OPACITY',
+     txt:r.opScore>50?'Opacity score '+r.opScore+'% — significant bright density detected. Consistent with consolidation or dense infiltrate.':
+         r.opScore>28?'Opacity score '+r.opScore+'% — mildly elevated. Possible early infiltrate or increased density.':'Opacity '+r.opScore+'% — within normal limits.'},
+    {sev:r.hasConsolid?'crit':'ok',tag:'CONSOLIDATION',
+     txt:r.hasConsolid?'Consolidation index '+(r.bpRatio*100).toFixed(1)+'% — bright patch areas detected within lung ROI. Possible air-space disease or consolidation.':
+         'Consolidation index '+(r.bpRatio*100).toFixed(1)+'% — no significant consolidation detected.'},
+    {sev:r.asymmPct>16?'crit':r.asymmPct>9?'warn':'ok',tag:'LATERALITY',
+     txt:r.asymmPct>16?'Significant asymmetry '+r.asymmPct+'% — '+r.heavySide+' lung field markedly denser. Unilateral infiltrate, effusion, or atelectasis possible.':
+         r.asymmPct>9?'Mild asymmetry '+r.asymmPct+'% — '+r.heavySide+' side slightly denser. May be positional or early unilateral change.':
+         'Bilateral symmetry normal ('+r.asymmPct+'% difference). Balanced lung fields.'},
+    {sev:r.bimodal?'warn':'ok',tag:'HISTOGRAM',
+     txt:r.bimodal?'Bimodal distribution ('+r.peaks.length+' peaks at ['+r.peaks.slice(0,4).join(',')+']). Mixed density suggests coexisting consolidated and aerated regions.':
+         'Unimodal intensity histogram. Uniform density distribution — no significant mixed-density pattern.'},
+    {sev:r.centralOpaque?'warn':'ok',tag:'HILAR',
+     txt:r.centralOpaque?'Central zone opacity elevated (mean ~'+Math.round(r.mean)+'). Possible perihilar infiltrate, hilar adenopathy, or central consolidation.':
+         'Central hilar region density within expected range.'},
+    {sev:r.lowerOpaque?'warn':'ok',tag:'LOWER ZONES',
+     txt:r.lowerOpaque?'Inferior zone opacity elevated — possible basal pneumonia, pleural effusion, or lower lobe atelectasis.':
+         'Lower zone density normal. No basal consolidation signal detected.'},
+    {sev:r.homog<42?'warn':'ok',tag:'TEXTURE',
+     txt:r.homog<42?'Low homogeneity '+r.homog+'% — high local variance indicates patchy heterogeneous texture consistent with irregular infiltrate pattern.':
+         r.homog<58?'Moderate texture variation '+r.homog+'% — some inhomogeneity present.':
+         'Field texture homogeneous '+r.homog+'%. Uniform parenchymal pattern.'},
+  ];
 
-  // Texture homogeneity
-  if (p.homogeneity < 42) findings.push({ sev: 'warn', label: 'TEXTURE', text: `Low homogeneity (${p.homogeneity}%) — patchy heterogeneous texture may indicate irregular infiltrate pattern.` });
-  else if (p.homogeneity < 58) findings.push({ sev: 'warn', label: 'TEXTURE', text: `Moderate texture variation (${p.homogeneity}%) — some heterogeneity present.` });
-  else findings.push({ sev: 'ok', label: 'TEXTURE', text: `Field texture homogeneous (${p.homogeneity}%) — uniform parenchymal pattern.` });
-
-  // Histogram
-  if (p.bimodal) findings.push({ sev: 'warn', label: 'HISTOGRAM', text: `Bimodal intensity distribution (${p.peaks} peaks at [${p.peakPositions.slice(0,3).join(', ')}]) — mixed density suggests coexisting consolidation and aeration.` });
-  else findings.push({ sev: 'ok', label: 'HISTOGRAM', text: `Unimodal intensity histogram — relatively uniform density distribution across the field.` });
-
-  // Central opacity
-  if (p.centralDark) findings.push({ sev: 'warn', label: 'HILAR', text: `Central field shows increased opacity — possible hilar adenopathy or mediastinal involvement.` });
-  else findings.push({ sev: 'ok', label: 'HILAR', text: `Central / hilar region appears within expected density range.` });
-
-  // Edge density
-  if (p.edgeDensity > 58) findings.push({ sev: 'warn', label: 'EDGES', text: `High edge density (${p.edgeDensity}%) — sharp texture boundaries may indicate air-space disease borders.` });
-  else findings.push({ sev: 'ok', label: 'EDGES', text: `Edge density within normal range (${p.edgeDensity}%) — no irregular sharp borders.` });
-
-  // Analysis rows
-  analysisRows.push(
-    { k: 'Mean pixel intensity', v: Math.round(p.mean) + ' / 255', cls: p.mean < 70 ? 'warn' : 'ok' },
-    { k: 'Std deviation', v: Math.round(p.stdDev), cls: p.stdDev > 65 ? 'warn' : 'ok' },
-    { k: 'Dark pixel fraction', v: (p.pDark * 100).toFixed(1) + '%', cls: p.pDark > 0.35 ? 'crit' : p.pDark > 0.2 ? 'warn' : 'ok' },
-    { k: 'Bright pixel fraction', v: (p.pBright * 100).toFixed(1) + '%', cls: 'ok' },
-    { k: 'Histogram modality', v: p.bimodal ? 'Bimodal' : 'Unimodal', cls: p.bimodal ? 'warn' : 'ok' },
-    { k: 'Consolidation proxy', v: p.consolidationProxy ? 'Elevated' : 'Normal', cls: p.consolidationProxy ? 'crit' : 'ok' },
-    { k: 'Composite score', v: p.abn + ' / 100', cls: p.abn >= 62 ? 'crit' : p.abn >= 38 ? 'warn' : 'ok' },
-  );
-
-  return { verdict, vClass, icon, title, summary, findings, analysisRows };
-}
-
-// ── Render results ────────────────────────────────────────────────────
-function renderResults(r) {
-  const i = r.interpretation;
-
-  // Show result panels
-  document.getElementById('emptyState').classList.add('hidden');
-  document.getElementById('resultContent').classList.remove('hidden');
-  document.getElementById('metricsCard').classList.remove('hidden');
-  document.getElementById('analysisCard').classList.remove('hidden');
-  document.getElementById('findingsCard').classList.remove('hidden');
-
-  // Score ring
-  const circ = 2 * Math.PI * 28;
-  const offset = circ * (1 - r.abn / 100);
-  const ring = document.getElementById('ringCircle');
-  const ringColors = { ok: '#2e6b4f', warn: '#b85c2a', crit: '#8c2020' };
-  ring.style.strokeDashoffset = circ; // reset
-  setTimeout(() => {
-    ring.style.strokeDashoffset = offset;
-    ring.style.stroke = ringColors[i.vClass];
-  }, 50);
-  document.getElementById('ringPct').textContent = r.abn;
-  document.getElementById('ringPct').setAttribute('fill', ringColors[i.vClass]);
-  document.getElementById('abnScore').textContent = r.abn;
-
-  // Verdict banner
-  const banner = document.getElementById('verdictBanner');
-  banner.className = 'verdict-banner ' + i.vClass;
-  document.getElementById('vIcon').textContent = i.icon;
-  document.getElementById('vTitle').textContent = i.title;
-  document.getElementById('vSub').textContent = i.summary;
-
-  // Metrics
-  const mc = { ok: 'ok', warn: 'warn', crit: 'crit' };
-  setMetric('mEdge', 'bEdge', r.edgeDensity + '%', r.edgeDensity, r.edgeDensity > 55 ? 'warn' : 'ok');
-  setMetric('mOp',   'bOp',   r.opScore + '%',     r.opScore,     r.opScore > 35 ? 'crit' : r.opScore > 20 ? 'warn' : 'ok');
-  setMetric('mHom',  'bHom',  r.homogeneity + '%', r.homogeneity, r.homogeneity < 45 ? 'warn' : 'ok');
-  setMetric('mAsym', 'bAsym', r.asymmScore + '%',  r.asymmScore,  r.asymmScore > 14 ? 'crit' : r.asymmScore > 7 ? 'warn' : 'ok');
-
-  // Analysis rows
-  const ar = document.getElementById('analysisRows');
-  ar.innerHTML = '';
-  i.analysisRows.forEach(row => {
-    ar.innerHTML += `<div class="analysis-row"><span class="ar-key">${row.k}</span><span class="ar-val ${row.cls}">${row.v}</span></div>`;
+  var fbEl=document.getElementById('fb');
+  fbEl.innerHTML='';
+  var flags=finds.filter(function(f){return f.sev!=='ok';}).length;
+  document.getElementById('flagCount').textContent=flags+' flag'+(flags!==1?'s':'');
+  finds.forEach(function(f){
+    var d=document.createElement('div');
+    d.className='fi';
+    d.innerHTML='<div class="fidot '+f.sev+'"></div><div class="fitext"><span class="fitag">'+f.tag+'</span>'+f.txt+'</div>';
+    fbEl.appendChild(d);
   });
 
-  // Findings
-  const fl = document.getElementById('findingsList');
-  fl.innerHTML = '';
-  i.findings.forEach(f => {
-    const li = document.createElement('li');
-    li.className = 'finding-item animate-in';
-    li.innerHTML = `<div class="finding-dot ${f.sev}"></div><div><span class="finding-label">${f.label}</span>${f.text}</div>`;
-    fl.appendChild(li);
+  // signals
+  var sigs=[
+    {k:'Mean intensity',v:Math.round(r.mean)+' / 255',c:r.mean<60||r.mean>200?'warn':'ok'},
+    {k:'Std deviation',v:Math.round(r.sd),c:r.sd>65?'warn':'ok'},
+    {k:'Very dark (0–50)',v:(r.pVD*100).toFixed(1)+'%',c:r.pVD>0.38?'crit':r.pVD>0.22?'warn':'ok'},
+    {k:'Dark (51–110)',v:(r.pD*100).toFixed(1)+'%',c:'ok'},
+    {k:'Bright (161–210)',v:(r.pB*100).toFixed(1)+'%',c:r.pB>0.30?'warn':'ok'},
+    {k:'Very bright (211–255)',v:(r.pVB*100).toFixed(1)+'%',c:r.pVB>0.18?'crit':r.pVB>0.08?'warn':'ok'},
+    {k:'Histogram peaks',v:r.peaks.length+' detected',c:r.bimodal?'warn':'ok'},
+    {k:'Patchy texture',v:r.patchy?'Present':'Absent',c:r.patchy?'warn':'ok'},
+    {k:'Strong edge ratio',v:(r.strongRatio*100).toFixed(2)+'%',c:r.strongRatio>0.07?'warn':'ok'},
+    {k:'Composite score',v:r.score+' / 100',c:r.score>=62?'crit':r.score>=36?'warn':'ok'},
+  ];
+  var sbEl=document.getElementById('sb');
+  sbEl.innerHTML='';
+  sigs.forEach(function(sg){
+    var d=document.createElement('div');
+    d.className='sigrow';
+    d.innerHTML='<span class="sigk">'+sg.k+'</span><span class="sigv '+sg.c+'">'+sg.v+'</span>';
+    sbEl.appendChild(d);
   });
 }
 
-function setMetric(valId, barId, val, pct, cls) {
-  document.getElementById(valId).textContent = val;
-  const bar = document.getElementById(barId);
-  bar.className = 'metric-fill ' + cls;
-  setTimeout(() => { bar.style.width = Math.min(100, pct) + '%'; }, 80);
+function setMC(i,val,pct,cls,desc){
+  document.getElementById('mv'+i).textContent=val;
+  document.getElementById('md'+i).textContent=desc;
+  var bar=document.getElementById('mb'+i);
+  bar.className='mc-fill '+cls;
+  bar.style.width='0%';
+  setTimeout(function(){bar.style.width=Math.min(100,pct)+'%';},80);
 }
 
-// ── Reset ─────────────────────────────────────────────────────────────
-function resetAll() {
-  grayData = null; sobelData = null;
-  fileInput.value = '';
-  previewCard.classList.add('hidden');
-  histCard.classList.add('hidden');
-  analyzeBtn.disabled = true;
-  resetBtn.classList.add('hidden');
-  document.getElementById('emptyState').classList.remove('hidden');
-  document.getElementById('resultContent').classList.add('hidden');
-  document.getElementById('metricsCard').classList.add('hidden');
-  document.getElementById('analysisCard').classList.add('hidden');
-  document.getElementById('findingsCard').classList.add('hidden');
-  document.getElementById('analysisTime').textContent = '';
+function resetAll(){
+  G=null; S=null;
+  document.getElementById('fi').value='';
+  document.getElementById('fbar').classList.remove('on');
+  document.getElementById('pw').classList.remove('on');
+  document.getElementById('hw').classList.remove('on');
+  document.getElementById('aBtn').disabled=true;
+  document.getElementById('rBtn').style.display='none';
+  document.getElementById('res').style.display='none';
 }
 </script>
 </body>
